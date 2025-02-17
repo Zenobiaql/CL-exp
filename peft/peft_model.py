@@ -279,7 +279,7 @@ class PeftModel(PushToHubMixin, torch.nn.Module):
             if param.requires_grad:
                 trainable_params += num_params
         print(
-            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param}"
+            f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param}, it is modified."
         )
 
     def __getattr__(self, name: str):
