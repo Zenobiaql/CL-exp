@@ -1,7 +1,7 @@
-description: It is a test script for singularity.
+description: Check New Project Setting
 env_defaults:
   NODES: 1 # The number of nodes you want to use
-  GPUS: 1 # number of gpus per node
+  GPUS: 2 # number of gpus per node
   MEM: 40 # gpu memory of each gpu, not important
 
 target:
@@ -10,6 +10,11 @@ target:
   name: msroctovc # change for different kinds of gpus. The detailed quota can be checked with command "amlt ti sing -v"
 
 storage: # mount the storage container
+  data:
+    storage_account_name: azsussc
+    container_name: v-wangxiaofa
+    mount_dir: /mnt/data-xiaofan
+    is_output: false
   my_output:
     storage_account_name: azsussc
     container_name: v-qilinzhang
@@ -18,7 +23,8 @@ storage: # mount the storage container
 environment: # select the image, clone your code, install the packages
   image: base/job/pytorch/acpt-2.1.2-cuda11.8:20240320T154353549
   setup:
-    - git clone https://github.com/Zenobiaql/ovla.git
+    - source activate base
+    - git clone https://github.com/Zenobiaql/CL-exp.git
   registry: singularitybase.azurecr.io # cached base images under amlt-sing/* seems not usable now, use singularitybase instead
 
 code:
@@ -28,7 +34,7 @@ data:
   storage_id: my_output
 
 jobs:
-  - name: test ovla upload # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
+  - name: Initialization Check # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
     sku: ${NODES}x${MEM}G${GPUS}-A100-IB # determinate the GPU you will use, please refer to the official docs for more information 
     process_count_per_node: 1 # usually 1
     sla_tier: Premium # Premium, Standard, Basic. corresponding to the priority.
@@ -41,5 +47,5 @@ jobs:
         SHARED_MEMORY_PERCENT: 0.5 # value in [0,1], change if necessary, shared memory size
 
     command:
-      - cd ovla/test-sing/
-      - python decorator-test.py
+      - cd CL-exp/debugging
+      - python3 initialize_check.py

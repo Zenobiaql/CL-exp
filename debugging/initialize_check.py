@@ -1,0 +1,1 @@
+print("Amlt initialization successful.")
