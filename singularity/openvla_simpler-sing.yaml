@@ -1,4 +1,4 @@
-description: Test single finetune pipeline.
+description: Test pipeline.
 env_defaults:
   NODES: 1 # The number of nodes you want to use
   GPUS: 8 # number of gpus per node
