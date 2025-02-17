@@ -349,7 +349,7 @@ def finetune(cfg: FinetuneConfig)->None:
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
-            target_modules="all-linear",
+            target_modules="k_proj",
             init_lora_weights="gaussian",
         )
         vla = get_peft_model(vla, lora_config)

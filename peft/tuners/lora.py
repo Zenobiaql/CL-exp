@@ -188,7 +188,7 @@ class LoraModel(torch.nn.Module):
         key_list = [key for key, _ in self.model.named_modules()]
         for key in key_list:
             if isinstance(lora_config.target_modules, str):
-                target_module_found = re.fullmatch(lora_config.target_modules, key)
+                target_module_found = key.endswith(lora_config.target_modules)
             else:
                 target_module_found = any(key.endswith(target_key) for target_key in lora_config.target_modules)
             if target_module_found:
