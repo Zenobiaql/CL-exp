@@ -30,6 +30,7 @@ from collections import deque
 
 from dataset import PizzaDataset
 import random
+from typing import List, Union
 
 # DDP process group setup
 def ddp_setup():
@@ -79,7 +80,8 @@ class FinetuneConfig:
     "LoRA Arguments"
     use_lora: bool                                        
     lora_rank: int                                           
-    lora_dropout: float                                                                                      
+    lora_dropout: float
+    lora_module: Union[List[str], str]                                                                                    
                                                                       
 # Model training class, adapted for different task and log/file settings    
 class ModelTrain:
@@ -349,19 +351,19 @@ def finetune(cfg: FinetuneConfig)->None:
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
-            target_modules="all-linear",
+            target_modules=cfg.lora_module,
             init_lora_weights="gaussian",
         )
         vla = get_peft_model(vla, lora_config)
         vla.print_trainable_parameters()
         
     # debug
-    if dist.get_rank() == 0:
-        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_modules.txt", "w") as file:
-            for name, param in vla.named_parameters():
-                if param.requires_grad:
-                    size = param.numel()
-                    file.write(f"name: {name}, size: {size}\n")
+#    if dist.get_rank() == 0:
+#        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_modules.txt", "w") as file:
+#            for name, param in vla.named_parameters():
+#                if param.requires_grad:
+#                    size = param.numel()
+#                    file.write(f"name: {name}, size: {size}\n")
             
     vla = vla.to(device_id)
     vla = DDP(vla, device_ids=[device_id], find_unused_parameters=True)
@@ -369,15 +371,15 @@ def finetune(cfg: FinetuneConfig)->None:
     trainable_params = [param for param in vla.module.parameters() if param.requires_grad]
     
     # debug
-    if dist.get_rank() == 0:
-        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_parameters_number.txt", "w") as file:
-            num_params = 0
-            num_modules = 0
-            for param in trainable_params:
-                num_params += param.numel()
-                num_modules += 1
-            file.write(f"num_params: {num_params}\n")
-            file.write(f"num_modules: {num_modules}\n")
+#    if dist.get_rank() == 0:
+#        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_parameters_number.txt", "w") as file:
+#            num_params = 0
+#            num_modules = 0
+#            for param in trainable_params:
+#                num_params += param.numel()
+#                num_modules += 1
+#            file.write(f"num_params: {num_params}\n")
+#            file.write(f"num_modules: {num_modules}\n")
     
     optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
     action_tokenizer = ActionTokenizer(processor.tokenizer)

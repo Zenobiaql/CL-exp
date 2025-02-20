@@ -29,8 +29,8 @@ environment: # select the image, clone your code, install the packages
     - conda create --name openvla python=3.10.12 -y
     - source activate base
     - conda activate openvla
-    - git clone https://github.com/Zenobiaql/ovla.git
-    - cd ovla
+    - git clone https://github.com/Zenobiaql/CL-exp.git
+    - cd CL-exp
     - pip install -r requirements-reduced.txt
   registry: singularitybase.azurecr.io # cached base images under amlt-sing/* seems not usable now, use singularitybase instead
 
@@ -54,7 +54,7 @@ jobs:
         SHARED_MEMORY_PERCENT: 0.5 # value in [0,1], change if necessary, shared memory size
 
     command:
-      - cd ovla
+      - cd CL-exp
       - source activate base
       - conda activate openvla
       - torchrun --standalone --nproc_per_node=8 openvla_simpler.py --config_path=configs/openvla_simpler_sing_config_1.yml

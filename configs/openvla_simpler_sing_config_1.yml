@@ -15,4 +15,5 @@ image_aug: True
 
 use_lora: True                                          
 lora_rank: 8                                            
-lora_dropout: 0.0                                                                       
+lora_dropout: 0.0
+lora_module: "all-linear"                                                                       

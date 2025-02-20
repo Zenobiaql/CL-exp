@@ -23,6 +23,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers.pytorch_utils import Conv1D
+from torch.nn import Conv2d
 
 from ..import_utils import is_bnb_available
 from ..utils import (
@@ -199,8 +200,11 @@ class LoraModel(torch.nn.Module):
                 target_module_found = key.endswith(lora_config.target_modules)
             else:
                 target_module_found = any(key.endswith(target_key) for target_key in lora_config.target_modules)
-                
-            if target_module_found:
+            
+            # debug
+            parent, target, target_name = _get_submodules(self.model, key)
+            
+            if target_module_found and not(isinstance(target, Conv2d)):
                 
                 #print("target_module_found: ", key)
                 
@@ -257,6 +261,7 @@ class LoraModel(torch.nn.Module):
                                 )
                                 kwargs["fan_in_fan_out"] = lora_config.fan_in_fan_out = True
                         else:
+                            print(f"target_parent: {parent}, key: {key}\n")
                             raise ValueError(
                                 f"Target module {target} is not supported. "
                                 f"Currently, only `torch.nn.Linear` and `Conv1D` are supported."
