@@ -42,7 +42,7 @@ class TaskType(str, enum.Enum):
 
 @dataclass
 class PeftConfigMixin(PushToHubMixin):
-    r"""
+    """
     This is the base configuration class for PEFT adapter models. It contains all the methods that are common to all
     PEFT adapter models. This class inherits from [`~transformers.utils.PushToHubMixin`] which contains the methods to
     push your model to the Hub. The method `save_pretrained` will save the configuration of your adapter model in a
@@ -143,6 +143,8 @@ class PeftConfig(PeftConfigMixin):
         inference_mode (`bool`, defaults to `False`): Whether to use the Peft model in inference mode.
     """
 
+    # PEFT最基本的4个配置
+    
     base_model_name_or_path: str = field(default=None, metadata={"help": "The name of the base model to use."})
     peft_type: Union[str, PeftType] = field(default=None, metadata={"help": "Peft type"})
     task_type: Union[str, TaskType] = field(default=None, metadata={"help": "Task type"})

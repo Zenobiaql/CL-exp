@@ -24,4 +24,6 @@ vla = AutoModelForVision2Seq.from_pretrained(
         trust_remote_code=True,
     )
 
-print([key for key, _ in vla.named_modules()])
+with open("model_modules.txt", "w") as file:
+    for name, param in vla.named_modules():
+        file.write(f"name: {name}\n")

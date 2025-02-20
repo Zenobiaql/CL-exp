@@ -100,6 +100,7 @@ def _prepare_prompt_learning_config(peft_config, model_config):
 
     return peft_config
 
+# 这个就是在openvla_simpler里用到的get_peft_model
 
 def get_peft_model(model, peft_config):
     """
@@ -111,9 +112,11 @@ def get_peft_model(model, peft_config):
     """
     model_config = model.config.to_dict() if hasattr(model.config, "to_dict") else model.config
     peft_config.base_model_name_or_path = model.__dict__.get("name_or_path", None)
+    # 获取PEFT模型
     if peft_config.task_type not in MODEL_TYPE_TO_PEFT_MODEL_MAPPING.keys() and not isinstance(
         peft_config, PromptLearningConfig
     ):
+        print("Get PEFT model successfully!")
         return PeftModel(model, peft_config)
     if isinstance(peft_config, PromptLearningConfig):
         peft_config = _prepare_prompt_learning_config(peft_config, model_config)

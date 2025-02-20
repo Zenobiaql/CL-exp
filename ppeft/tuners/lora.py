@@ -87,6 +87,7 @@ class LoraConfig(PeftConfig):
     r_sum: int = field(default=0) # modified. This argument represents the dim of the previous LoRA parameters. 
     save_loranew: bool = field(default=False) # modified. This arguments represents whether modules named of 'loranew_A/B' are saved independently, rather than being combined with "lora_A/B".  
 
+    # 表示创建实例后自动将peft_type设置为LORA
     def __post_init__(self):
         self.peft_type = PeftType.LORA
 
@@ -154,19 +155,26 @@ class LoraModel(torch.nn.Module):
         self.forward = self.model.forward
         self.peft_config = config
         self.add_adapter(adapter_name, self.peft_config[adapter_name])
+        print("adapter added")
 
     def add_adapter(self, adapter_name, config=None):
         if config is not None:
             model_config = self.model.config.to_dict() if hasattr(self.model.config, "to_dict") else self.model.config
             config = self._prepare_lora_config(config, model_config)
             self.peft_config[adapter_name] = config
+            
+        print(adapter_name)
+        print(self.peft_config[adapter_name])
+        
         self._find_and_replace(adapter_name)
         if len(self.peft_config) > 1 and self.peft_config[adapter_name].bias != "none":
             raise ValueError(
                 "LoraModel supports only 1 adapter with bias. When using multiple adapters, set bias to 'none' for all adapters."
             )
         mark_only_lora_as_trainable(self.model, self.peft_config[adapter_name].bias)
+        print("marked")
         if self.peft_config[adapter_name].inference_mode:
+            print("inference mode")
             _freeze_adapter(self.model, adapter_name)
 
     def _find_and_replace(self, adapter_name):
@@ -191,7 +199,11 @@ class LoraModel(torch.nn.Module):
                 target_module_found = key.endswith(lora_config.target_modules)
             else:
                 target_module_found = any(key.endswith(target_key) for target_key in lora_config.target_modules)
+                
             if target_module_found:
+                
+                #print("target_module_found: ", key)
+                
                 if not is_target_modules_in_base_model:
                     is_target_modules_in_base_model = True
                 parent, target, target_name = _get_submodules(self.model, key)
@@ -250,8 +262,16 @@ class LoraModel(torch.nn.Module):
                                 f"Currently, only `torch.nn.Linear` and `Conv1D` are supported."
                             )
                         new_module = Linear(adapter_name, in_features, out_features, bias=bias, r_sum=lora_config.r_sum, **kwargs) # modified
+                        
+                        # debug
+                        with open("trainable_modules_rank.txt", "a") as file:                        
+                            file.write(f"rank: {new_module.r}\n")
+                        
+                        with open("debug1.txt", "a") as file:
+                            file.write(f"?\n")
 
                     self._replace_module(parent, target_name, new_module, target)
+                    #print("replaced")
         if not is_target_modules_in_base_model:
             raise ValueError(
                 f"Target modules {lora_config.target_modules} not found in the base model. "
@@ -260,6 +280,9 @@ class LoraModel(torch.nn.Module):
 
     def _replace_module(self, parent_module, child_name, new_module, old_module):
         setattr(parent_module, child_name, new_module)
+        
+        #print("replace successfully")
+        
         new_module.weight = old_module.weight
         if hasattr(old_module, "bias"):
             if old_module.bias is not None:
@@ -408,6 +431,10 @@ def mark_only_lora_as_trainable(model: nn.Module, bias: str = "none") -> None:
     for n, p in model.named_parameters():
         if "lora_" not in n:
             p.requires_grad = False
+            #print("no")
+        else:
+            p.requires_grad = True
+            #print("yes", n)
     if bias == "none":
         return
     elif bias == "all":
@@ -458,8 +485,8 @@ class LoraLayer:
         if r > 0:
             self.loranew_A.update(nn.ModuleDict({adapter_name: nn.Linear(self.in_features, r, bias=False)})) # modified
             self.loranew_B.update(nn.ModuleDict({adapter_name: nn.Linear(r, self.out_features, bias=False)})) # modified
-            self.lora_A.update(nn.ModuleDict({adapter_name: nn.Linear(self.in_features, r_sum, bias=False)})) # modified
-            self.lora_B.update(nn.ModuleDict({adapter_name: nn.Linear(r_sum, self.out_features, bias=False)})) # modified
+            self.lora_A.update(nn.ModuleDict({adapter_name: nn.Linear(self.in_features, r, bias=False)})) # modified
+            self.lora_B.update(nn.ModuleDict({adapter_name: nn.Linear(r, self.out_features, bias=False)})) # modified
             self.scaling[adapter_name] = lora_alpha / r
         if init_lora_weights:
             self.reset_lora_parameters(adapter_name)
@@ -513,7 +540,7 @@ class Linear(nn.Linear, LoraLayer):
         adapter_name: str,
         in_features: int,
         out_features: int,
-        r: int = 0,
+        r: int = 1,
         lora_alpha: int = 1,
         lora_dropout: float = 0.0,
         fan_in_fan_out: bool = False,  # Set this to True if the layer to replace stores weight like (fan_in, fan_out)

@@ -36,6 +36,8 @@ from .tuners import (
     PromptEmbedding,
     PromptEncoder,
 )
+
+# 可以看出, PEFT和Prompt Learning是两个总体不同的方法
 from .utils import (
     TRANSFORMERS_MODELS_TO_PREFIX_TUNING_POSTPROCESS_MAPPING,
     WEIGHTS_NAME,
@@ -60,6 +62,8 @@ PEFT_TYPE_TO_MODEL_MAPPING = {
     PeftType.ADAPTION_PROMPT: AdaptionPromptModel,
 }
 
+# PushToHubMixin作为一个混入类包含了save_pretrained方法
+# PEFT实现插入LoRA的思路是, 根据参数块的名称找到对应的参数块并进行修改
 
 class PeftModel(PushToHubMixin, torch.nn.Module):
     """
@@ -75,6 +79,9 @@ class PeftModel(PushToHubMixin, torch.nn.Module):
         - **peft_config** ([`PeftConfig`]) -- The configuration of the Peft model.
         - **modules_to_save** (`list` of `str`) -- The list of sub-module names to save when
         saving the model.
+        ## 这个属性对应的就是只保存适配器的功能
+        
+        ## 以下的是prompt learning的属性, 应该用不到
         - **prompt_encoder** ([`PromptEncoder`]) -- The prompt encoder used for Peft if
         using [`PromptLearningConfig`].
         - **prompt_tokens** (`torch.Tensor`) -- The virtual prompt tokens used for Peft if
@@ -85,21 +92,30 @@ class PeftModel(PushToHubMixin, torch.nn.Module):
         in the base model if using [`PromptLearningConfig`].
     """
 
+    # 初始化一个PEFT model, 至少需要两个参数, model(基础模型)和peft_config(PEFT配置)
+    
     def __init__(self, model, peft_config: PeftConfig, adapter_name="default"):
         super().__init__()
         self.base_model = model
         self.config = self.base_model.config
+        # config是基础模型的配置
         self.modules_to_save = None
         self.peft_config = {}
+        # self.peft_config不是直接对应peft_config?
         self.active_adapter = adapter_name
         self.peft_type = peft_config.peft_type
+        # peft_type指定了使用的PEFT方法, 通过PEFT_TYPE_TO_MODEL_MAPPING找到对应的PEFT model
         self.base_model_torch_dtype = getattr(model, "dtype", None)
+        # 找到模型的dtype, 可能用于量化
         if not isinstance(peft_config, PromptLearningConfig):
             self.peft_config[adapter_name] = peft_config
+            # self.base_model在这里变成了PEFT化的model
             self.base_model = PEFT_TYPE_TO_MODEL_MAPPING[peft_config.peft_type](
                 self.base_model, self.peft_config, adapter_name
             )
+            print("PEFT model is created.")
             self.set_additional_trainable_modules(peft_config, adapter_name)
+        # 这是Prompt Learning的部分, 用不到
         else:
             self.add_adapter(adapter_name, peft_config)
 
