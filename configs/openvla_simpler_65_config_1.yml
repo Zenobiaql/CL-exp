@@ -2,18 +2,19 @@ vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"
 
 pizza_dir: "/datahdd_8T/zql/CL-Adapter/dataset"                       
 dataset_name: "simpler-65"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0220-Debug"                         
-adapter_tmp_dir: "/datahdd_8T/zql/CL-Adapter/runs/0220-Debug/adapter"                                                      
+run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0224-32Rank"                         
+adapter_tmp_dir: "/datahdd_8T/zql/CL-Adapter/runs/0224-32Rank/adapter"                                                      
 
-epochs: 30                                                
+epochs: 50                                                
 batch_size: 8                                        
 
 save_steps: 1000                                          
 learning_rate: 1.5e-5                                     
-grad_accumulation_steps: 2                            
+grad_accumulation_steps: 1                            
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 8                                            
+lora_rank: 32                                            
 lora_dropout: 0.0
-lora_module: ["proj", "mlp.fc1", "mlp.fc2"]                                                                       
+lora_module: "all-linear"
+#lora_module: ["proj", "qkv", "fc1", "fc2", "fc3"]                                                                       

@@ -358,12 +358,12 @@ def finetune(cfg: FinetuneConfig)->None:
         vla.print_trainable_parameters()
         
     # debug
-    if dist.get_rank() == 0:
-        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_modules.txt", "w") as file:
-            for name, param in vla.named_parameters():
-                if param.requires_grad:
-                    size = param.numel()
-                    file.write(f"name: {name}, size: {size}\n")
+#    if dist.get_rank() == 0:
+#        with open("debugging/0222-block/trainable_modules5.txt", "w") as file:
+#            for name, param in vla.named_parameters():
+#                if param.requires_grad:
+#                   size = param.numel()
+#                    file.write(f"name: {name}, size: {size}\n")
             
     vla = vla.to(device_id)
     vla = DDP(vla, device_ids=[device_id], find_unused_parameters=True)
@@ -372,12 +372,16 @@ def finetune(cfg: FinetuneConfig)->None:
     
     # debug
     if dist.get_rank() == 0:
-        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_parameters_number.txt", "w") as file:
+        with open("debugging/0222-block/trainable_parameters_number6.txt", "w") as file:
             num_params = 0
             num_modules = 0
             for param in trainable_params:
                 num_params += param.numel()
                 num_modules += 1
+#                p = param.cpu().detach().numpy()
+#                file.write(f"param_shape: {p.shape}, param: {p}\n")
+#                del p
+#                
             file.write(f"num_params: {num_params}\n")
             file.write(f"num_modules: {num_modules}\n")
     
@@ -388,11 +392,13 @@ def finetune(cfg: FinetuneConfig)->None:
     )
     
     val_dataloader_set = {}
+    
+    i = 0
 
     data_root_dir = Path(cfg.pizza_dir)
     for task in tqdm.tqdm(data_root_dir.iterdir(), desc="Incremental Training"):
             
-            if task.is_dir():
+            if task.is_dir() and i < 1:
                 
                 task_run_dir= os.path.join(run_dir, f"task-{task.name}") 
                 task_adapter_dir = os.path.join(adapter_dir, f"task-{task.name}")
@@ -466,8 +472,13 @@ def finetune(cfg: FinetuneConfig)->None:
                 
             else:
                 pass
+            
+            i += 1
 
     dist.destroy_process_group()
+    if dist.get_rank() == 0:
+        logger.info("Finished running code.")
+        val_logger.info("Finished running code.")
     print(f"Finished running code on rank {device_id}.")
 
 if __name__ == "__main__":
