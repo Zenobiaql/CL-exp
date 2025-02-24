@@ -2,10 +2,10 @@ vla_path: "/mnt/data-qilin/openvla-7b/"
 
 pizza_dir: "/mnt/data-qilin/simpler_data/google_robot_close_bottom_drawer/"                       
 dataset_name: "simpler-blob"                                
-run_root_dir: "/mnt/data-qilin/CL-exp/SingleTask/google_robot_close_bottom_drawer/"                         
-adapter_tmp_dir: "/mnt/data-qilin/CL-exp/SingleTask/google_robot_close_bottom_drawer/adapter"
+run_root_dir: "/mnt/data-qilin/CL-exp/8rTask/google_robot_close_bottom_drawer/"                         
+adapter_tmp_dir: "/mnt/data-qilin/CL-exp/8rTask/google_robot_close_bottom_drawer/adapter"
 
-sample_file_dir: "/mnt/data-qilin/CL-exp/SingleTask/google_robot_close_bottom_drawer/sample"
+sample_file_dir: "/mnt/data-qilin/CL-exp/8rTask/google_robot_close_bottom_drawer/sample"
 
 epochs: 50                                                
 batch_size: 4                                        
@@ -16,6 +16,6 @@ grad_accumulation_steps: 1
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 1                                            
+lora_rank: 8                                            
 lora_dropout: 0.0
 lora_module: "all-linear"                                                                       
