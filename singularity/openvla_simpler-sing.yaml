@@ -1,4 +1,4 @@
-description: Test pipeline.
+description: Single task pipeline.
 env_defaults:
   NODES: 1 # The number of nodes you want to use
   GPUS: 8 # number of gpus per node
@@ -57,4 +57,4 @@ jobs:
       - cd CL-exp
       - source activate base
       - conda activate openvla
-      - torchrun --standalone --nproc_per_node=8 openvla_simpler.py --config_path=configs/openvla_simpler_sing_config_1.yml
+      - torchrun --standalone --nproc_per_node=8 openvla_simpler_singletask.py --config_path=configs/openvla_simpler_sing_config_1.yml

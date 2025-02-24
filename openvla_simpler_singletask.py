@@ -372,6 +372,30 @@ def finetune(cfg: FinetuneConfig)->None:
 
     trainable_params = [param for param in vla.module.parameters() if param.requires_grad]
     
+    
+    if dist.get_rank() == 0:
+        
+        os.makedirs(cfg.sample_file_dir, exist_ok=True)
+    
+        train_module_file_dir = os.path.join(cfg.sample_file_dir, "trainable_modules.txt")
+        train_param_file_dir = os.path.join(cfg.sample_file_dir, "trainable_parameters.txt")
+        
+        with open(train_module_file_dir, "w") as file:
+            for name, param in vla.named_parameters():
+                if param.requires_grad:
+                    size = param.numel()
+                    file.write(f"name: {name}, size: {size}\n")
+                    
+        with open(train_param_file_dir, "w") as file:
+            num_params = 0
+            num_modules = 0
+            for param in trainable_params:
+                num_params += param.numel()
+                num_modules += 1
+            file.write(f"num_params: {num_params}\n")
+            file.write(f"num_modules: {num_modules}\n")
+    
+    
     # debug
 #    if dist.get_rank() == 0:
 #        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_parameters_number.txt", "w") as file:
@@ -392,19 +416,18 @@ def finetune(cfg: FinetuneConfig)->None:
     val_dataloader_set = {}
 
     data_root_dir = Path(cfg.pizza_dir)
-    for task in tqdm.tqdm(data_root_dir.iterdir(), desc="Incremental Training"):
             
-            if task.is_dir():
+    if data_root_dir.is_dir():
                 
-                task_run_dir= os.path.join(run_dir, f"task-{task.name}") 
-                task_adapter_dir = os.path.join(adapter_dir, f"task-{task.name}")
+                task_run_dir= os.path.join(run_dir, f"task-{data_root_dir.name}") 
+                task_adapter_dir = os.path.join(adapter_dir, f"task-{data_root_dir.name}")
                 if dist.get_rank() == 0:
                     os.makedirs(task_run_dir, exist_ok=True)
                     os.makedirs(task_adapter_dir, exist_ok=True)
 
                 # current task dataset
                 task_data = PizzaDataset(
-                    str(task),
+                    str(data_root_dir),
                     action_tokenizer,
                     processor.tokenizer,
                     processor.image_processor.apply_transform,
@@ -437,7 +460,7 @@ def finetune(cfg: FinetuneConfig)->None:
                 )
                 
                 # add validation dataloader of current task to the set
-                val_dataloader_set[task.name] = val_dataloader
+                val_dataloader_set[data_root_dir.name] = val_dataloader
     
                 model_train = ModelTrain(
                     cfg.epochs, 
@@ -458,15 +481,15 @@ def finetune(cfg: FinetuneConfig)->None:
 
                     dataloader,
                     val_dataloader_set,
-                    task.name,
+                    data_root_dir.name,
                     
                     device_id,
                 )
 
                 model_train.train_step()
-                vla = model_train.update_vla()
+#                vla = model_train.update_vla()
                 
-            else:
+    else:
                 pass
 
     dist.destroy_process_group()
