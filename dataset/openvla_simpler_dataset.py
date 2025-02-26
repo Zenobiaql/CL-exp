@@ -20,9 +20,12 @@ class PizzaDataset(Dataset):
             prompt_builder_fn)
     
         p = Path(data_root_dir)
+        
+        i = 0
         self.data = []
         for subdir in tqdm(p.iterdir(), desc="Processing subdirectories"):
-            if subdir.is_dir():
+            if subdir.is_dir() and i < 1:
+                        i += 1  
 #                for subsubdir in subdir.iterdir():
 #                   if subsubdir.is_dir():
                         frame_file = subdir / 'frames.npy'

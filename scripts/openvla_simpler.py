@@ -50,40 +50,7 @@ def get_logger(name, file_path):
     if file_path is not None: 
         logger.addHandler(f_handler)
     
-    return logger
-
-# Finetuning configuration, passed with .yaml or .yml file
-@dataclass
-class FinetuneConfig:
-    
-    # model path
-    vla_path: str
-
-    "Data Configuration"
-    # dataset root directory       
-    pizza_dir: str
-    # name of dataset class                        
-    dataset_name: str
-    # directory for log and checkpoints                            
-    run_root_dir: str
-    # directory for adapter checkpoints                               
-    adapter_tmp_dir: str
-    # directory for statistical files
-    sample_file_dir: str                                      
-
-    "Finetuning Configuration"
-    epochs: int                                                
-    batch_size: int                                                                                        
-    save_steps: int                                            
-    learning_rate: float                                       
-    grad_accumulation_steps: int                               
-    image_aug: bool                                         
-                        
-    "LoRA Arguments"
-    use_lora: bool                                        
-    lora_rank: int                                           
-    lora_dropout: float
-    lora_module: Union[List[str], str]                                                                                    
+    return logger                                                                                   
                                                                       
 # Model training class, adapted for different task and log/file settings    
 class ModelTrain:
@@ -305,13 +272,10 @@ class ModelTrain:
 
         return new_vla        
                 
-
-@draccus.wrap()
-def finetune(cfg: FinetuneConfig)->None:
+def finetune(cfg)->None:
     ddp_setup()
 
-    if dist.get_rank() == 0:
-        os.makedirs(cfg.run_root_dir, exist_ok=True)
+    os.makedirs(cfg.run_root_dir, exist_ok=True)
 
     current_time = time.strftime('%Y-%m-%d-%H-%M', time.localtime())
     log_path = os.path.join(cfg.run_root_dir, f"time{current_time}.log")
@@ -361,17 +325,14 @@ def finetune(cfg: FinetuneConfig)->None:
         
     # debug
 #    if dist.get_rank() == 0:
-<<<<<<< HEAD
 #        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_modules.txt", "w") as file:
 #            for name, param in vla.named_parameters():
 #                if param.requires_grad:
 #                    size = param.numel()
-=======
 #        with open("debugging/0222-block/trainable_modules5.txt", "w") as file:
 #            for name, param in vla.named_parameters():
 #                if param.requires_grad:
 #                   size = param.numel()
->>>>>>> c1dea1a5878622387700a3601bb7c442c0a7c54b
 #                    file.write(f"name: {name}, size: {size}\n")
             
     vla = vla.to(device_id)
@@ -380,7 +341,6 @@ def finetune(cfg: FinetuneConfig)->None:
     trainable_params = [param for param in vla.module.parameters() if param.requires_grad]
     
     # debug
-<<<<<<< HEAD
 #    if dist.get_rank() == 0:
 #        with open("/mnt/data-qilin/openvla_simpler_cl/0220-CheckPeft/trainable_parameters_number.txt", "w") as file:
 #            num_params = 0
@@ -390,7 +350,6 @@ def finetune(cfg: FinetuneConfig)->None:
 #                num_modules += 1
 #            file.write(f"num_params: {num_params}\n")
 #            file.write(f"num_modules: {num_modules}\n")
-=======
     if dist.get_rank() == 0:
         with open("debugging/0222-block/trainable_parameters_number6.txt", "w") as file:
             num_params = 0
@@ -404,7 +363,6 @@ def finetune(cfg: FinetuneConfig)->None:
 #                
             file.write(f"num_params: {num_params}\n")
             file.write(f"num_modules: {num_modules}\n")
->>>>>>> c1dea1a5878622387700a3601bb7c442c0a7c54b
     
     optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
     action_tokenizer = ActionTokenizer(processor.tokenizer)

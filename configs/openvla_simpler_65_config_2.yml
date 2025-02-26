@@ -1,12 +1,10 @@
 vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"                          
 
-pizza_dir: "/datahdd_8T/zql/CL-Adapter/dataset"                       
+data_dir: "/datahdd_8T/zql/CL-Adapter/dataset"                       
 dataset_name: "simpler-65"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0225-32Rank"                         
-adapter_tmp_dir: "/datahdd_8T/zql/CL-Adapter/runs/0225-32Rank/adapter"                                                      
-sample_file_dir: "/datahdd_8T/zql/CL-Adapter/runs/0225-32Rank/sample"
+run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0226-Test5"                         
 
-epochs: 50                                                
+epochs: 10                                                
 batch_size: 8                                        
 
 save_steps: 1000                                          
