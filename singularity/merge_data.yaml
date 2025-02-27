@@ -24,13 +24,13 @@ environment: # select the image, clone your code, install the packages
   image: base/job/pytorch/acpt-2.1.2-cuda11.8:20240320T154353549
   setup:
     - source activate base
-    - conda init bash
-    - source ~/.bashrc
-    - conda create --name openvla python=3.10.12 -y
-    - source activate base
-    - conda activate openvla
     - git clone https://github.com/Zenobiaql/CL-exp.git
     - pip install draccus
+    - pip install numpy
+    - pip install pathlib
+    - pip install tqdm
+    - pip install multiprocessing
+    - pip install dataclasses
   registry: singularitybase.azurecr.io # cached base images under amlt-sing/* seems not usable now, use singularitybase instead
 
 code:
@@ -53,5 +53,5 @@ jobs:
         SHARED_MEMORY_PERCENT: 0.5 # value in [0,1], change if necessary, shared memory size
 
     command:
-      - cd CL-exp/debugging
-      - python3 initialize_check.py
+      - cd CL-exp
+      - python3 dataset/merge_dataset_2.py --config_path=configs/merge_simpler_data_config.yml
