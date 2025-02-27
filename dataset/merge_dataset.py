@@ -6,8 +6,9 @@ from tqdm import tqdm
 import time
 import draccus
 from multiprocessing import Pool, cpu_count
+from dataclasses import dataclass
 
-
+@dataclass
 class DataMergingConfig:
     
     root_dir: str
@@ -36,11 +37,16 @@ def merge_traj(data_root_dir: str, output_dir: str, logger)->None:
     
     os.makedirs(output_dir, exist_ok=True)
     
-    instruction_path = os.join(output_dir, 'instruction.txt')
-    action_path = os.join(output_dir, 'action.npy')
-    frame_path = os.join(output_dir, 'frames.npy')
+    instruction_path = os.path.join(output_dir, 'instruction.txt')
+    action_path = os.path.join(output_dir, 'action.npy')
+    frame_path = os.path.join(output_dir, 'frames.npy')
     
     root = Path(data_root_dir)
+        
+    cpu_id = os.getpid()
+    logger.info(f"Task {root.name} is being processed by CPU core {cpu_id}.")
+    print(f"Task {root.name} is being processed by CPU core {cpu_id}.")
+    
     action_data = []
     frame_data = []
     
@@ -106,9 +112,12 @@ def main(cfg: DataMergingConfig)->None:
     # root include triple level structure, root/task/traj/ins&frame&act
     p = Path(cfg.root_dir)
     subdirs = [subdir for subdir in p.iterdir() if subdir.is_dir()]
+    
+    logger.info(f"CPU count: {cpu_count()}")
+    logger.info(f"Start to merge {len(subdirs)} directories.")
 
     with Pool(processes=cpu_count()) as pool:
-        pool.starmap(process_subdir, [(subdir, os.join(cfg.output_dir, subdir.name), logger) for subdir in subdirs])
+        pool.starmap(process_subdir, [(subdir, os.path.join(cfg.output_dir, subdir.name), logger) for subdir in subdirs])
         
 
 if __name__ == "__main__":

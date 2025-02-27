@@ -1,2 +1,2 @@
-root_dir: 
-output_dir:
+root_dir: "/mnt/v-qilin/simpler_data"
+output_dir: "/mnt/v-qilin/simpler_data_merged"
