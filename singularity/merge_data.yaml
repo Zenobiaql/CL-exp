@@ -1,7 +1,7 @@
 description: Merge Simpler Data
 env_defaults:
   NODES: 1 # The number of nodes you want to use
-  GPUS: 2 # number of gpus per node
+  GPUS: 1 # number of gpus per node
   MEM: 40 # gpu memory of each gpu, not important
 
 target:
