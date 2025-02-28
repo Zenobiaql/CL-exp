@@ -1,6 +1,6 @@
 vla_path: "/mnt/data-qilin/openvla-7b/"                          
 
-data_dir: "/mnt/data-qilin/simpler_data/"                       
+data_dir: "/mnt/data-qilin/simpler_data_merged/"                       
 dataset_name: "simpler-blob"                                
 run_root_dir: "/mnt/data-qilin/CL-exp/SingleTaskBaseline/rank1/"                         
 
