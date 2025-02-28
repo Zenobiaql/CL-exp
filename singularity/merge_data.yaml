@@ -24,13 +24,14 @@ environment: # select the image, clone your code, install the packages
   image: base/job/pytorch/acpt-2.1.2-cuda11.8:20240320T154353549
   setup:
     - source activate base
+    - conda init bash
+    - source ~/.bashrc
+    - conda create --name openvla python=3.10.12 -y
+    - source activate base
+    - conda activate openvla
     - git clone https://github.com/Zenobiaql/CL-exp.git
-    - pip install draccus
-    - pip install numpy
-    - pip install pathlib
-    - pip install tqdm
-    - pip install multiprocessing
-    - pip install dataclasses
+    - cd CL-exp
+    - pip install -r requirements-reduced.txt
   registry: singularitybase.azurecr.io # cached base images under amlt-sing/* seems not usable now, use singularitybase instead
 
 code:
@@ -40,7 +41,7 @@ data:
   storage_id: my_output
 
 jobs:
-  - name: Initialization Check # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
+  - name: Merge Data # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
     sku: ${NODES}x${MEM}G${GPUS}-A100-IB # determinate the GPU you will use, please refer to the official docs for more information 
     process_count_per_node: 1 # usually 1
     sla_tier: Premium # Premium, Standard, Basic. corresponding to the priority.
@@ -54,4 +55,6 @@ jobs:
 
     command:
       - cd CL-exp
+      - source activate base
+      - conda activate openvla
       - python3 dataset/merge_dataset_2.py --config_path=configs/merge_simpler_data_config.yml
