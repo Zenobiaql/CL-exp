@@ -304,7 +304,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
             # current task dataset
             task_data = PizzaDataset(
-                str(task),
+                task,
                 action_tokenizer,
                 processor.tokenizer,
                 processor.image_processor.apply_transform,

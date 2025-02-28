@@ -1,2 +1,2 @@
-root_dir: "/mnt/data-qilin/simpler_data"
-output_dir: "/mnt/data-qilin/simpler_data_merged"
+root_dir: "/datahdd_8T/zql/CL-Adapter/dataset"
+output_dir: "/datahdd_8T/zql/CL-Adapter/dataset_merged"
