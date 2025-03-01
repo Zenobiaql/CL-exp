@@ -45,7 +45,8 @@ class FinetuneConfig:
     # name of dataset class                        
     dataset_name: str
     # directory for log and checkpoints                            
-    run_root_dir: str                                   
+    run_root_dir: str
+    num_workers: int                                   
 
     "Finetuning Configuration"
     epochs: int                                                

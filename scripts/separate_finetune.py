@@ -60,7 +60,8 @@ class FinetuneConfig:
     # name of dataset class                        
     dataset_name: str
     # directory for log and checkpoints                            
-    run_root_dir: str                                    
+    run_root_dir: str
+    num_workers: int                                    
 
     "Finetuning Configuration"
     epochs: int                                                
@@ -328,7 +329,7 @@ def finetune(cfg: FinetuneConfig)->None:
                     batch_size=cfg.batch_size,
                     sampler=DistributedSampler(Subset(task_data, train_indices)),
                     collate_fn=collator,
-                    num_workers=6,
+                    num_workers=cfg.num_workers,
                 )
                     
                 val_dataloader = DataLoader(
@@ -336,7 +337,7 @@ def finetune(cfg: FinetuneConfig)->None:
                     batch_size=cfg.batch_size,
                     sampler=DistributedSampler(Subset(task_data, val_indices)),
                     collate_fn=collator,
-                    num_workers=6,
+                    num_workers=cfg.num_workers,
                 )
                     
                 # add training and validation dataloader of current task to the set

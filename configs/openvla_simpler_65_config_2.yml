@@ -2,7 +2,8 @@ vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"
 
 data_dir: "/datahdd_8T/zql/CL-Adapter/dataset_merged"                       
 dataset_name: "simpler-65"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0301-debug"                         
+run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0301-debug1"
+num_workers: 4                         
 
 epochs: 10                                                
 batch_size: 8                                        
