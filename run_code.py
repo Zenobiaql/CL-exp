@@ -28,7 +28,7 @@ from prismatic.vla.action_tokenizer import ActionTokenizer
 from dataclasses import dataclass
 from collections import deque
 
-from dataset import PizzaDataset
+from dataset import SimplerDataset
 import random
 from typing import List, Union
 from scripts import finetune

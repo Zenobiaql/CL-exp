@@ -28,7 +28,7 @@ from prismatic.vla.action_tokenizer import ActionTokenizer
 from dataclasses import dataclass
 from collections import deque
 
-from dataset import PizzaDataset
+from dataset import SimplerDataset
 import random
 from typing import List, Union
 from log import ModelLogger, ModuleTracker
@@ -301,45 +301,50 @@ def finetune(cfg: FinetuneConfig)->None:
     if data_root_dir.is_dir():
     
         for task in tqdm.tqdm(data_root_dir.iterdir(), desc="Tasks"):
-
-            # current task dataset
-            task_data = PizzaDataset(
-                task,
-                action_tokenizer,
-                processor.tokenizer,
-                processor.image_processor.apply_transform,
-                prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
-            )
-                
-            # divide dataset into train and validation set
-            indices = list(range(len(task_data)))
-            random.shuffle(indices)
-                
-            train_ratio = 0.7
-            train_size = int(train_ratio * len(indices))
-            train_indices = indices[:train_size]
-            val_indices = indices[train_size:]
-                
-            dataloader = DataLoader(
-                Subset(task_data, train_indices),
-                batch_size=cfg.batch_size,
-                sampler=DistributedSampler(Subset(task_data, train_indices)),
-                collate_fn=collator,
-                num_workers=0,
-            )
-                
-            val_dataloader = DataLoader(
-                Subset(task_data, val_indices),
-                batch_size=cfg.batch_size,
-                sampler=DistributedSampler(Subset(task_data, val_indices)),
-                collate_fn=collator,
-                num_workers=0,
-            )
-                
-            # add training and validation dataloader of current task to the set
             
-            dataloader_set[task.name] = dataloader
-            val_dataloader_set[task.name] = val_dataloader
+            if task.is_dir():
+
+                # current task dataset
+                task_data = SimplerDataset(
+                    task,
+                    action_tokenizer,
+                    processor.tokenizer,
+                    processor.image_processor.apply_transform,
+                    prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
+                )
+                    
+                # divide dataset into train and validation set
+                indices = list(range(len(task_data)))
+                random.shuffle(indices)
+                    
+                train_ratio = 0.7
+                train_size = int(train_ratio * len(indices))
+                train_indices = indices[:train_size]
+                val_indices = indices[train_size:]
+                    
+                dataloader = DataLoader(
+                    Subset(task_data, train_indices),
+                    batch_size=cfg.batch_size,
+                    sampler=DistributedSampler(Subset(task_data, train_indices)),
+                    collate_fn=collator,
+                    num_workers=0,
+                )
+                    
+                val_dataloader = DataLoader(
+                    Subset(task_data, val_indices),
+                    batch_size=cfg.batch_size,
+                    sampler=DistributedSampler(Subset(task_data, val_indices)),
+                    collate_fn=collator,
+                    num_workers=0,
+                )
+                    
+                # add training and validation dataloader of current task to the set
+                
+                dataloader_set[task.name] = dataloader
+                val_dataloader_set[task.name] = val_dataloader
+                
+            else:
+                pass
         
     else:
         pass
