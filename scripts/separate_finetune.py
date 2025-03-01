@@ -328,7 +328,7 @@ def finetune(cfg: FinetuneConfig)->None:
                     batch_size=cfg.batch_size,
                     sampler=DistributedSampler(Subset(task_data, train_indices)),
                     collate_fn=collator,
-                    num_workers=8,
+                    num_workers=6,
                 )
                     
                 val_dataloader = DataLoader(
@@ -336,7 +336,7 @@ def finetune(cfg: FinetuneConfig)->None:
                     batch_size=cfg.batch_size,
                     sampler=DistributedSampler(Subset(task_data, val_indices)),
                     collate_fn=collator,
-                    num_workers=8,
+                    num_workers=6,
                 )
                     
                 # add training and validation dataloader of current task to the set
