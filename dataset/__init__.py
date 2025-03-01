@@ -1,1 +1,1 @@
-from .openvla_simpler_dataset import PizzaDataset
+from .index_dataset import SimplerDataset
