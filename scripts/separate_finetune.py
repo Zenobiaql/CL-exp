@@ -358,7 +358,8 @@ def finetune(cfg: FinetuneConfig)->None:
         os.makedirs(task_sub_dir, exist_ok=True)
             
         logger_complex = ModelLogger(cfg.vla_path, task_id, cfg.batch_size, cfg.learning_rate, task_sub_dir)
-
+        
+        
         # get initialized vla
         init_vla = AutoModelForVision2Seq.from_pretrained(
             cfg.vla_path,

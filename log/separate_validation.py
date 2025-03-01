@@ -35,11 +35,11 @@ class ModelLogger():
             self.val_logger.info(f"Fine-tuning OpenVLA Model `{vla_path}` on `{dataset_name}`")
         
     def log_train_step(self, syn_smoothened_loss, syn_smoothened_action_accuracy, syn_smoothened_l1_loss, gradient_step_idx):
-        #if dist.get_rank() == 0:
+        if dist.get_rank() == 0:
             self.logger.info(f"train_loss: {syn_smoothened_loss:.4f}, action_accuracy: {syn_smoothened_action_accuracy:.4f}, l1_loss: {syn_smoothened_l1_loss:.4f}, step: {gradient_step_idx}")
             
     def log_val_step(self, val_dataset_name, mul_avg_loss, mul_avg_accuracy, mul_avg_action_l1_loss):
-        #if dist.get_rank() == 0:
+        if dist.get_rank() == 0:
             self.val_logger.info(f"On dataset {val_dataset_name}, Loss:{mul_avg_loss:.4f}, Accuracy:{mul_avg_accuracy:.4f}, L1 Loss:{mul_avg_action_l1_loss:.4f}.")
     
     def log_val_start(self, epoch):

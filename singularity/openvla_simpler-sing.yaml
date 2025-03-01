@@ -32,6 +32,7 @@ environment: # select the image, clone your code, install the packages
     - git clone https://github.com/Zenobiaql/CL-exp.git
     - cd CL-exp
     - pip install -r requirements-reduced.txt
+    - pip install -e .
   registry: singularitybase.azurecr.io # cached base images under amlt-sing/* seems not usable now, use singularitybase instead
 
 code:
