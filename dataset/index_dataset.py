@@ -21,7 +21,7 @@ class SimplerDataset(Dataset):
                
         action_file  = self.data_dir / 'action.npy'
         actions = np.load(action_file)
-        self.indx = [i for i in range(len(actions))]
+        self.indx = [i for i in range(40)]
         
                       
     def __len__(self):
