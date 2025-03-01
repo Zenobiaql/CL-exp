@@ -28,6 +28,8 @@ class ModelLogger():
         self.logger = get_logger(f"log{dataset_name}", os.path.join(run_root_path, f"time{current_time}.log"))
         self.val_logger = get_logger(f"val_log{dataset_name}", os.path.join(run_root_path, f"time{current_time}-validation.log"))
         
+        self.val_logger.info("debug")
+        self.logger.info("debug")
         if dist.get_rank() == 0:
             self.logger.info(f"Fine-tuning OpenVLA Model `{vla_path}` on `{dataset_name}`")
             self.logger.info(f"Training setting batch size {batch_size}, learning rate {learning_rate}")
