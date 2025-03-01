@@ -267,7 +267,7 @@ class Model:
             self._validate_step(epoch)
 
             if self.use_lora:
-                if dist.get_rank() == 0:
+                #if dist.get_rank() == 0:
                     self.logger_complex.log_checkpoint_saved(epoch)
                     save_dir = self.run_dir
                     self.vla.module.save_pretrained(os.path.join(save_dir, f'epoch{epoch}'))
