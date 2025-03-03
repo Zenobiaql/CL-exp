@@ -57,7 +57,7 @@ def _get_traj_frame(data_root_dir: Path, logger)->None:
         logger.info(f"Skipping {str(data_root_dir)}, as it is not a directory.")
         print(f"Skipping {str(data_root_dir)}, as it is not standard.")
     
-    return frame_data
+    return np.delete(frame_data, -1)
         
 
 def _collect_submerge(data_root_dir: str, output_dir: str, logger)->None:
@@ -80,6 +80,10 @@ def _collect_submerge(data_root_dir: str, output_dir: str, logger)->None:
     with Pool(processes=cpu_count()) as pool:
         action_data = pool.starmap(_get_traj_action, [(subdir, logger) for subdir in root.iterdir()])
         frame_data = pool.starmap(_get_traj_frame, [(subdir, logger) for subdir in root.iterdir()])
+        
+    if len(action_data) != len(frame_data):
+        logger.error(f"Action and frame data length mismatch for {root.name}")
+        raise ValueError(f"Action and frame data length mismatch for {root.name}")
     
     np.save(action_path, np.concatenate(action_data, axis=0))
     np.save(frame_path, np.concatenate(frame_data, axis=0))

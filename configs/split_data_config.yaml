@@ -1,0 +1,3 @@
+root_dir: "/home/v-qilinzhang/merged_data/simpler_data_merged"
+tv_rate: 0.7
+output_dir: "/home/v-qilinzhang/merged_data/simpler_splitdata_merged"

@@ -1,2 +1,2 @@
-root_dir: "/datahdd_8T/zql/CL-Adapter/dataset"
-output_dir: "/datahdd_8T/zql/CL-Adapter/dataset_merged"
+root_dir: "/home/v-qilinzhang/raw_data/simpler_data"
+output_dir: "/home/v-qilinzhang/merged_data/simpler_data_merged_debugged_2"
