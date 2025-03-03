@@ -1,8 +1,8 @@
 vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"                          
 
-data_dir: "/datahdd_8T/zql/CL-Adapter/dataset_merged"                       
-dataset_name: "simpler-65"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0301-debug1"
+data_dir: "/datahdd_8T/zql/CL-Adapter/merged_data_split"                       
+dataset_name: "google_robot_open_drawer"                                
+run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0303-Debug"
 num_workers: 4                         
 
 epochs: 10                                                
