@@ -1,9 +1,9 @@
 vla_path: "/mnt/data-qilin/openvla-7b/"                          
 
-data_dir: "/mnt/data-qilin/simpler_data_merged/"                       
-dataset_name: "simpler-blob"                                
-run_root_dir: "/mnt/data-qilin/CL-exp/SingleTaskBaseline/debug5/"
-num_workers: 24                         
+data_dir: "/mnt/data-qilin/simpler_data_merged_split/"                       
+dataset_name: "google_robot_close_bottom_drawer"                                
+run_root_dir: "/mnt/data-qilin/CL-exp/SingleTaskBaseline/rank1/"
+num_workers: 4                         
 
 epochs: 50                                                
 batch_size: 4                                        

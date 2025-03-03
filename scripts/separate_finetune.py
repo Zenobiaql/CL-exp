@@ -28,13 +28,14 @@ from prismatic.vla.action_tokenizer import ActionTokenizer
 from dataclasses import dataclass
 from collections import deque
 
-from dataset import SimplerDataset
+from dataset import PizzaDataset
 import random
 from typing import List, Union
 from log import ModelLogger, ModuleTracker
 
 from copy import deepcopy
 from multiprocessing import cpu_count
+import numpy as np
 
 
 # DDP process group setup
@@ -295,133 +296,119 @@ def finetune(cfg: FinetuneConfig)->None:
         processor.tokenizer.model_max_length, processor.tokenizer.pad_token_id, padding_side="right"
     )
     
-    dataloader_set = {}
-    val_dataloader_set = {}
-
-    data_root_dir = Path(cfg.data_dir)
+    data_root_dir = Path(os.path.join(cfg.data_dir, "train", cfg.dataset_name))
             
+    # training set for current task
     if data_root_dir.is_dir():
-    
-        for task in tqdm.tqdm(data_root_dir.iterdir(), desc="Tasks"):
-            
-            if task.is_dir():
-
-                # current task dataset
-                task_data = SimplerDataset(
-                    task,
-                    action_tokenizer,
-                    processor.tokenizer,
-                    processor.image_processor.apply_transform,
-                    prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
-                )
-                    
-                # divide dataset into train and validation set
-                indices = list(range(len(task_data)))
-                random.shuffle(indices)
-                    
-                train_ratio = 0.7
-                train_size = int(train_ratio * len(indices))
-                train_indices = indices[:train_size]
-                val_indices = indices[train_size:]
-                    
-                dataloader = DataLoader(
-                    Subset(task_data, train_indices),
-                    batch_size=cfg.batch_size,
-                    sampler=DistributedSampler(Subset(task_data, train_indices)),
-                    collate_fn=collator,
-                    num_workers=cfg.num_workers,
-                )
-                    
-                val_dataloader = DataLoader(
-                    Subset(task_data, val_indices),
-                    batch_size=cfg.batch_size,
-                    sampler=DistributedSampler(Subset(task_data, val_indices)),
-                    collate_fn=collator,
-                    num_workers=cfg.num_workers,
-                )
-                    
-                # add training and validation dataloader of current task to the set
-                
-                dataloader_set[task.name] = dataloader
-                val_dataloader_set[task.name] = val_dataloader
-                
-            else:
-                pass
-        
-    else:
-        pass
-    
-    
-    for task_id, dataloader in dataloader_set.items():
-        
-        task_sub_dir = os.path.join(cfg.run_root_dir, task_id)
-        os.makedirs(task_sub_dir, exist_ok=True)
-            
-        logger_complex = ModelLogger(cfg.vla_path, task_id, cfg.batch_size, cfg.learning_rate, task_sub_dir)
-        
-        
-        # get initialized vla
-        init_vla = AutoModelForVision2Seq.from_pretrained(
-            cfg.vla_path,
-            torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=True,
-            trust_remote_code=True,
+        # current task dataset
+        task_data = PizzaDataset(
+            data_root_dir,
+            action_tokenizer,
+            processor.tokenizer,
+            processor.image_processor.apply_transform,
+            prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
         )
-
-        if cfg.use_lora:
-            lora_config = LoraConfig(
-                r=cfg.lora_rank,
-                lora_alpha=min(cfg.lora_rank, 16),
-                lora_dropout=cfg.lora_dropout,
-                target_modules=cfg.lora_module,
-                init_lora_weights="gaussian",
+                    
+        dataloader = DataLoader(
+            task_data,
+            batch_size=cfg.batch_size,
+            sampler=DistributedSampler(task_data, shuffle=True),
+            collate_fn=collator,
+            num_workers=cfg.num_workers,
+        )
+    
+    val_data_dir = Path(os.path.join(cfg.data_dir, "val"))
+    val_dataloader_set = {}
+    
+    # validation set for current task
+    for sub_dir in val_data_dir.iterdir():
+        if sub_dir.is_dir():
+            val_data = PizzaDataset(
+                sub_dir,
+                action_tokenizer,
+                processor.tokenizer,
+                processor.image_processor.apply_transform,
+                prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
             )
-            init_vla = get_peft_model(init_vla, lora_config)
-            init_vla.print_trainable_parameters()
-        
-        device_id = int(os.environ["LOCAL_RANK"])
-        init_vla = init_vla.to(device_id)
-        init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
-
-        trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
-        optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
-        
-        module_tracker = ModuleTracker(trainable_params, task_sub_dir)
-        module_tracker.trainable_module()
-        
-        exp_id = (
-            f"{task_id}"
-            f"+b{cfg.batch_size * cfg.grad_accumulation_steps}"
-            f"+lr-{cfg.learning_rate}"
-        )
-        if cfg.use_lora:
-            exp_id += f"+lora-r{cfg.lora_rank}+dropout-{cfg.lora_dropout}"
             
-        logger_complex.log_training_config(exp_id)
+            val_dataloader = DataLoader(
+                val_data,
+                batch_size=cfg.batch_size,
+                sampler=DistributedSampler(val_data, shuffle=True),
+                collate_fn=collator,
+                num_workers=cfg.num_workers,
+            )
+            
+            val_dataloader_set[sub_dir.name] = val_dataloader
     
-        model_train = Model(
-                    cfg.epochs, 
-                    cfg.batch_size,
-                    cfg.grad_accumulation_steps,
+        
+    task_sub_dir = os.path.join(cfg.run_root_dir, data_root_dir.name)
+    os.makedirs(task_sub_dir, exist_ok=True)
+            
+    logger_complex = ModelLogger(cfg.vla_path, data_root_dir.name, cfg.batch_size, cfg.learning_rate, task_sub_dir)
+        
+    # get initialized vla
+    init_vla = AutoModelForVision2Seq.from_pretrained(
+        cfg.vla_path,
+        torch_dtype=torch.bfloat16,
+        low_cpu_mem_usage=True,
+        trust_remote_code=True,
+    )
+
+    if cfg.use_lora:
+        lora_config = LoraConfig(
+            r=cfg.lora_rank,
+            lora_alpha=min(cfg.lora_rank, 16),
+            lora_dropout=cfg.lora_dropout,
+            target_modules=cfg.lora_module,
+            init_lora_weights="gaussian",
+        )
+        init_vla = get_peft_model(init_vla, lora_config)
+        init_vla.print_trainable_parameters()
+        
+    device_id = int(os.environ["LOCAL_RANK"])
+    init_vla = init_vla.to(device_id)
+    init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
+
+    trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
+    optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
+        
+    module_tracker = ModuleTracker(trainable_params, task_sub_dir)
+    module_tracker.trainable_module()
+        
+    exp_id = (
+        f"{data_root_dir.name}"
+        f"+b{cfg.batch_size * cfg.grad_accumulation_steps}"
+        f"+lr-{cfg.learning_rate}"
+    )
+    if cfg.use_lora:
+        exp_id += f"+lora-r{cfg.lora_rank}+dropout-{cfg.lora_dropout}"
+            
+    logger_complex.log_training_config(exp_id)
+    
+    model_train = Model(
+        cfg.epochs, 
+        cfg.batch_size,
+        cfg.grad_accumulation_steps,
                     
-                    task_sub_dir,
-                    logger_complex,
+        task_sub_dir,
+        logger_complex,
 
-                    optimizer, 
-                    init_vla,
-                    cfg.vla_path,
-                    processor,
-                    action_tokenizer,
-                    cfg.use_lora,
+        optimizer, 
+        init_vla,
+        cfg.vla_path,
+        processor,
+        action_tokenizer,
+        cfg.use_lora,
 
-                    dataloader,
-                    val_dataloader_set,
-                    data_root_dir.name,
+        dataloader,
+        val_dataloader_set,
+        data_root_dir.name,
                     
-                    device_id,
-                )
+        device_id,
+    )
 
-        model_train.train_step()
+    model_train.train_step()
 
 
     dist.destroy_process_group()
