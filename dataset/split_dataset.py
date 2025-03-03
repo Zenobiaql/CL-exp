@@ -54,15 +54,18 @@ def data_spliting(cfg: DataSplitConfig)->None:
             else:
                 length = len_action
                 logger.info(f"Length of action and frames for {sub_dir_name} is {length}")
-                
-            np.random.shuffle(action)
-            np.random.shuffle(frames)
+            
+            index = [idx for idx in range(length)]
+            np.random.shuffle(index)
             
             tv_len = int(length * cfg.tv_rate)
-            train_action = action[:tv_len]
-            train_frames = frames[:tv_len]
-            val_action = action[tv_len:]
-            val_frames = frames[tv_len:]
+            train_index = index[:tv_len]
+            val_index = index[tv_len:]
+            
+            train_action = action[train_index]
+            train_frames = frames[train_index]
+            val_action = action[val_index]
+            val_frames = frames[val_index]
             
             logger.info(f"Length of train action and frames for {sub_dir_name} is {len(train_action)}.")
             logger.info(f"Length of val action and frames for {sub_dir_name} is {len(val_action)}.")
