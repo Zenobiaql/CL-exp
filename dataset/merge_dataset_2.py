@@ -57,7 +57,7 @@ def _get_traj_frame(data_root_dir: Path, logger)->None:
         logger.info(f"Skipping {str(data_root_dir)}, as it is not a directory.")
         print(f"Skipping {str(data_root_dir)}, as it is not standard.")
     
-    return np.delete(frame_data, -1)
+    return np.delete(frame_data, -1, axis=0)
         
 
 def _collect_submerge(data_root_dir: str, output_dir: str, logger)->None:
@@ -119,7 +119,10 @@ def main(cfg: DataMergingConfig)->None:
     logger.info(f"Start to merge {len(subdirs)} directories.")
 
     for subdir in subdirs:
-        process_subdir(subdir, os.path.join(cfg.output_dir, subdir.name), logger)
+        if os.path.exists(os.path.join(cfg.output_dir, subdir.name)):
+            logger.info(f"Skip {subdir.name}, as it already exists.")
+        else:
+            process_subdir(subdir, os.path.join(cfg.output_dir, subdir.name), logger)
         
     logger.info(f"Finish merging {len(subdirs)} directories.")
         

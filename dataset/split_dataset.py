@@ -55,8 +55,8 @@ def data_spliting(cfg: DataSplitConfig)->None:
                 length = len_action
                 logger.info(f"Length of action and frames for {sub_dir_name} is {length}")
                 
-            action = np.random.shuffle(action)
-            frames = np.random.shuffle(frames)
+            np.random.shuffle(action)
+            np.random.shuffle(frames)
             
             tv_len = int(length * cfg.tv_rate)
             train_action = action[:tv_len]
@@ -67,8 +67,10 @@ def data_spliting(cfg: DataSplitConfig)->None:
             logger.info(f"Length of train action and frames for {sub_dir_name} is {len(train_action)}.")
             logger.info(f"Length of val action and frames for {sub_dir_name} is {len(val_action)}.")
             
-            train_dir = os.makedirs(cfg.output_dir, "train", sub_dir_name, exist_ok=True)
-            val_dir = os.makedirs(cfg.output_dir, "val", sub_dir_name, exist_ok=True)
+            train_dir = os.path.join(cfg.output_dir, "train", sub_dir_name)
+            val_dir = os.path.join(cfg.output_dir, "val", sub_dir_name)
+            os.makedirs(train_dir, exist_ok=True)
+            os.makedirs(val_dir, exist_ok=True)
             
             np.save(os.path.join(train_dir, "action.npy"), train_action)
             np.save(os.path.join(train_dir, "frames.npy"), train_frames)
@@ -89,7 +91,7 @@ def data_spliting(cfg: DataSplitConfig)->None:
                 logger.info(f"Saved val instruction for {sub_dir_name}.")
                 
         else:
-            pass    
+            logger.info(f"{sub_dir.name} is not a directory.")    
 
             
 if __name__ == "__main__":
