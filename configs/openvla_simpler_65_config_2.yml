@@ -1,7 +1,7 @@
 vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"                          
 
 data_dir: "/datahdd_8T/zql/CL-Adapter/merged_dataset"                       
-dataset_name: "pizza-dataset"                                
+dataset_name: "widowx_stack_cube"                                
 run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0304-Debug-new"
 num_workers: 4                         
 
