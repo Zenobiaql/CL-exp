@@ -1,11 +1,11 @@
 vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"                          
 
 data_dir: "/datahdd_8T/zql/CL-Adapter/merged_data_split"                       
-dataset_name: "google_robot_open_drawer"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0303-Debug"
+dataset_name: "google_robot_open_top_drawer"                                
+run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0304-rank16"
 num_workers: 4                         
 
-epochs: 10                                                
+epochs: 25                                                
 batch_size: 8                                        
 
 save_steps: 1000                                          
@@ -14,7 +14,7 @@ grad_accumulation_steps: 1
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 32                                            
+lora_rank: 16                                            
 lora_dropout: 0.0
 lora_module: "all-linear"
 #lora_module: ["proj", "qkv", "fc1", "fc2", "fc3"]                                                                       
