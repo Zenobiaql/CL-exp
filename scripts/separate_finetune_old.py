@@ -302,38 +302,39 @@ def finetune(cfg: FinetuneConfig)->None:
             
     # training set for current task
     for sub_dir in data_root_dir.iterdir():
+        if sub_dir.is_dir():
         # current task dataset
-        task_data = PizzaDataset(
-            sub_dir,
-            action_tokenizer,
-            processor.tokenizer,
-            processor.image_processor.apply_transform,
-            prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
-        )
-        
-        index = [i for i in range(len(task_data))]
-        random.shuffle(index)
-        val_index = index[:len(index)//10]
-        train_index = index[len(index)//10:]
+            task_data = PizzaDataset(
+                sub_dir,
+                action_tokenizer,
+                processor.tokenizer,
+                processor.image_processor.apply_transform,
+                prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
+            )
+            
+            index = [i for i in range(len(task_data))]
+            random.shuffle(index)
+            val_index = index[:len(index)//10]
+            train_index = index[len(index)//10:]
                     
-        dataloader = DataLoader(
-            Subset(task_data, train_index),
-            batch_size=cfg.batch_size,
-            sampler=DistributedSampler(Subset(task_data, train_index), shuffle=True),
-            collate_fn=collator,
-            num_workers=cfg.num_workers,
-        )
+            dataloader = DataLoader(
+                Subset(task_data, train_index),
+                batch_size=cfg.batch_size,
+                sampler=DistributedSampler(Subset(task_data, train_index), shuffle=True),
+                collate_fn=collator,
+                num_workers=cfg.num_workers,
+            )
 
-        val_dataloader = DataLoader(
-            Subset(task_data, val_index),
-            batch_size=cfg.batch_size,
-            sampler=DistributedSampler(Subset(task_data, val_index), shuffle=True),
-            collate_fn=collator,
-            num_workers=cfg.num_workers,
-        )
-        
-        dataloader_set[sub_dir.name] = dataloader
-        val_dataloader_set[sub_dir.name] = val_dataloader
+            val_dataloader = DataLoader(
+                Subset(task_data, val_index),
+                batch_size=cfg.batch_size,
+                sampler=DistributedSampler(Subset(task_data, val_index), shuffle=True),
+                collate_fn=collator,
+                num_workers=cfg.num_workers,
+            )
+            
+            dataloader_set[sub_dir.name] = dataloader
+            val_dataloader_set[sub_dir.name] = val_dataloader
         
     for task_name, dataloader in dataloader_set.items():
         task_sub_dir = os.path.join(cfg.run_root_dir, task_name)
