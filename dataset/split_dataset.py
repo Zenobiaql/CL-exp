@@ -62,9 +62,9 @@ def data_spliting(cfg: DataSplitConfig)->None:
             train_index = index[:tv_len]
             val_index = index[tv_len:]
             
-            train_action = action[train_index]
+            train_action = action[train_index] 
             train_frames = frames[train_index]
-            val_action = action[val_index]
+            val_action = action[val_index] 
             val_frames = frames[val_index]
             
             logger.info(f"Length of train action and frames for {sub_dir_name} is {len(train_action)}.")

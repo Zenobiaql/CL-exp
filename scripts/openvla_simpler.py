@@ -51,6 +51,37 @@ def get_logger(name, file_path):
         logger.addHandler(f_handler)
     
     return logger                                                                                   
+
+
+@dataclass
+class FinetuneConfig:
+    
+    # model path
+    vla_path: str
+
+    "Data Configuration"
+    # dataset root directory       
+    data_dir: str
+    # name of dataset class                        
+    dataset_name: str
+    # directory for log and checkpoints                            
+    run_root_dir: str
+    num_workers: int                                   
+
+    "Finetuning Configuration"
+    epochs: int                                                
+    batch_size: int                                                                                        
+    save_steps: int                                            
+    learning_rate: float                                       
+    grad_accumulation_steps: int                               
+    image_aug: bool                                         
+                        
+    "LoRA Arguments"
+    use_lora: bool                                        
+    lora_rank: int                                           
+    lora_dropout: float
+    lora_module: Union[List[str], str]
+
                                                                       
 # Model training class, adapted for different task and log/file settings    
 class ModelTrain:
@@ -271,7 +302,8 @@ class ModelTrain:
         new_vla = self.vla
 
         return new_vla        
-                
+
+@draccus.wrap()                
 def finetune(cfg)->None:
     ddp_setup()
 
