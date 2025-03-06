@@ -284,14 +284,14 @@ def finetune(cfg: FinetuneConfig)->None:
             )
             
             index = [i for i in range(len(task_data))]
-            random.shuffle(index)
+            #random.shuffle(index)
             val_index = index[:len(index)//10]
             train_index = index[len(index)//10:]
                     
             dataloader = DataLoader(
                 Subset(task_data, train_index),
                 batch_size=cfg.batch_size,
-                sampler=DistributedSampler(Subset(task_data, train_index), shuffle=True),
+                sampler=DistributedSampler(Subset(task_data, train_index)),
                 collate_fn=collator,
                 num_workers=cfg.num_workers,
             )
@@ -299,7 +299,7 @@ def finetune(cfg: FinetuneConfig)->None:
             val_dataloader = DataLoader(
                 Subset(task_data, val_index),
                 batch_size=cfg.batch_size,
-                sampler=DistributedSampler(Subset(task_data, val_index), shuffle=True),
+                sampler=DistributedSampler(Subset(task_data, val_index)),
                 collate_fn=collator,
                 num_workers=cfg.num_workers,
             )

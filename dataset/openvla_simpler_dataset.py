@@ -21,24 +21,27 @@ class PizzaDataset(Dataset):
         
         self.data = []
         
-        frame_file = self.data_dir / 'frames.npy'
-        action_file  = self.data_dir / 'action.npy'
-        instruction_file = self.data_dir / 'instruction.txt'
+        for sub_dir in self.data_dir.iterdir():
+            
+            if sub_dir.is_dir():
+                frame_file = sub_dir / 'frames.npy'
+                action_file  = sub_dir / 'action.npy'
+                instruction_file = sub_dir / 'instruction.txt'
                         
-        frames = np.load(frame_file)
-        actions = np.load(action_file)
+                frames = np.load(frame_file)
+                actions = np.load(action_file)
         
-        with open(instruction_file, 'r') as f:
-            instruction = f.read()
-            for i in tqdm(range(len(actions)), desc=f"Processing files in {self.data_dir.name}"):
-                data_pack = {}
-                data_pack["dataset_name"] = "PIZZADATASET"
-                data_pack['action'] = [actions[i]]
-                data_pack["observation"] = {}
-                data_pack["observation"]["image_primary"] = [frames[i]]
-                data_pack["task"] = {}
-                data_pack["task"]["language_instruction"] = instruction
-                self.data.append(data_pack)
+                with open(instruction_file, 'r') as f:
+                    instruction = f.read()
+                    for i in tqdm(range(len(actions)), desc=f"Processing files in {sub_dir.name}"):
+                        data_pack = {}
+                        data_pack["dataset_name"] = "PIZZADATASET"
+                        data_pack['action'] = [actions[i]]
+                        data_pack["observation"] = {}
+                        data_pack["observation"]["image_primary"] = [frames[i]]
+                        data_pack["task"] = {}
+                        data_pack["task"]["language_instruction"] = instruction
+                        self.data.append(data_pack)
                       
     def __len__(self):
         return len(self.data)

@@ -1,8 +1,8 @@
 vla_path: "/home/v-qilinzhang/openvla-7b"                          
 
-data_dir: "/home/v-qilinzhang/simpler_data_fordebug"                       
+data_dir: "/home/v-qilinzhang/dataset_for_debug/raw_dataset"                       
 dataset_name: "simpler_data"                                
-run_root_dir: "/home/v-qilinzhang/runs/0305-2156-sandbox"
+run_root_dir: "/home/v-qilinzhang/runs/0306-1207-sandbox"
 num_workers: 4                         
 
 epochs: 25                                                
