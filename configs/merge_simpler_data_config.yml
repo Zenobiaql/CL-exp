@@ -1,2 +1,2 @@
-root_dir: "/home/v-qilinzhang/raw_data/simpler_data"
-output_dir: "/home/v-qilinzhang/merged_data/simpler_data_merged_debugged"
+root_dir: "/home/v-qilinzhang/dataset_for_debug/raw_dataset_xiaofan"
+output_dir: "/home/v-qilinzhang/dataset_for_debug/merged_dataset_xiaofan"

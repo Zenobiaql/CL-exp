@@ -287,6 +287,8 @@ def finetune(cfg: FinetuneConfig)->None:
             #random.shuffle(index)
             val_index = index[:len(index)//10]
             train_index = index[len(index)//10:]
+            print(len(val_index))
+            print(len(train_index))
                     
             dataloader = DataLoader(
                 Subset(task_data, train_index),
@@ -303,6 +305,9 @@ def finetune(cfg: FinetuneConfig)->None:
                 collate_fn=collator,
                 num_workers=cfg.num_workers,
             )
+            
+            print(len(val_dataloader))
+            print(len(dataloader))
             
             dataloader_set[sub_dir.name] = dataloader
             val_dataloader_set[sub_dir.name] = val_dataloader
