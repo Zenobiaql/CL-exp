@@ -31,8 +31,7 @@ from collections import deque
 from dataset import PizzaDataset
 import random
 from typing import List, Union
-from scripts.sandbox_split import finetune
-#from debugging.debug_train import finetune
+from scripts import finetune
 
 @dataclass
 class FinetuneConfig:
