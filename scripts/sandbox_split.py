@@ -323,6 +323,11 @@ def finetune(cfg: FinetuneConfig)->None:
         init_vla = get_peft_model(init_vla, lora_config)
         init_vla.print_trainable_parameters()
         
+    with open(os.path.join(task_sub_dir, "trainable_parameters.txt"), "w") as f:
+        for name, param in init_vla.named_parameters():
+            if param.requires_grad:
+                f.write(f"{name}\n")
+        
     device = torch.device("cuda")
     print(f"Running code on {device}.")
     init_vla = init_vla.to(device)
