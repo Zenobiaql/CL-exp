@@ -137,7 +137,11 @@ class SandboxModuleTracker():
             num_modules = 0
             for param in self.trainable_params:
                 num_params += param.numel()
-                num_modules += 1              
+                num_modules += 1
+                file.write(f"module_name: {param.name}\n")
+                file.write(f"module_param: {param.numel()}\n")
+                file.write(f"{type(param).__name__}\n")
+            file.write(f"---------------------\n")              
             file.write(f"num_params: {num_params}\n")
             file.write(f"num_modules: {num_modules}\n")
         
