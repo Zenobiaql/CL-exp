@@ -28,7 +28,7 @@ from prismatic.vla.action_tokenizer import ActionTokenizer
 from dataclasses import dataclass
 from collections import deque
 
-from dataset import PizzaDataset
+from dataset import SplitDataset
 import random
 from typing import List, Union
 from log import ModelLogger, ModuleTracker
@@ -301,7 +301,7 @@ def finetune(cfg: FinetuneConfig)->None:
     # training set for current task
     if data_root_dir.is_dir():
         # current task dataset
-        task_data = PizzaDataset(
+        task_data = SplitDataset(
             data_root_dir,
             action_tokenizer,
             processor.tokenizer,
@@ -323,7 +323,7 @@ def finetune(cfg: FinetuneConfig)->None:
     # validation set for current task
     for sub_dir in val_data_dir.iterdir():
         if sub_dir.is_dir():
-            val_data = PizzaDataset(
+            val_data = SplitDataset(
                 sub_dir,
                 action_tokenizer,
                 processor.tokenizer,
