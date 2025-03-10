@@ -1,0 +1,4 @@
+root_dir: "/home/v-qilinzhang/statics/0307-1600-Test"
+module_name: "language_model.model.layers.22.self_attn.v_proj.weight"
+output_path: "/home/v-qilinzhang/statics/0307-1716-Cos"
+log_path: "/home/v-qilinzhang/statics/0307-1716-Cos/logger.log"
