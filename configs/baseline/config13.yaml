@@ -1,6 +1,6 @@
 vla_path: "/mnt/data-qilin/openvla-7b/"                          
 
-data_dir: "/mnt/data-qilin/simpler_data_merged_split/"                       
+data_dir: "/mnt/data-qilin/simpler_data_split/"                       
 dataset_name: "widowx_spoon_on_towel"                                
 run_root_dir: "/mnt/data-qilin/LoRA-Baseline/rank8-single-task/"
 num_workers: 4                         
