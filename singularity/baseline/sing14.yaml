@@ -42,7 +42,7 @@ data:
   storage_id: my_output
 
 jobs:
-  - name: Rank8 google_robot_open_top_drawer # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
+  - name: Rank8 widowx_stack_cube # the job name you will see on the portal. Though not important, you'd better carefully set it for clarity.
     sku: ${NODES}x${MEM}G${GPUS}-A100-IB # determinate the GPU you will use, please refer to the official docs for more information 
     process_count_per_node: 1 # usually 1
     sla_tier: Premium # Premium, Standard, Basic. corresponding to the priority.
@@ -58,4 +58,4 @@ jobs:
       - cd CL-exp
       - source activate base
       - conda activate openvla
-      - torchrun --standalone --nproc_per_node=8 run_code.py --config_path=configs/baseline/config6.yaml
+      - torchrun --standalone --nproc_per_node=8 run_code.py --config_path=configs/baseline/config14.yaml
