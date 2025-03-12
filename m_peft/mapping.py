@@ -143,6 +143,8 @@ def get_peft_config(config_dict: dict[str, Any]) -> PeftConfig:
     return PEFT_TYPE_TO_CONFIG_MAPPING[config_dict["peft_type"]](**config_dict)
 
 
+# get_peft_model 是将原始模型包装为peft模型的核心函数
+
 def get_peft_model(
     model: PreTrainedModel,
     peft_config: PeftConfig,
@@ -175,6 +177,8 @@ def get_peft_model(
             Create empty adapter weights on meta device. Useful to speed up the loading process. Leave this setting as
             False if you intend on training the model, unless the adapter weights will be replaced by different weights
             before training starts.
+            
+        在目前的训练脚本中只用到了model和peft_config两个参数, 一个指定vla, 一个指定LoRA的配置
     """
     model_config = BaseTuner.get_model_config(model)
     old_name = peft_config.base_model_name_or_path

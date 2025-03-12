@@ -132,6 +132,12 @@ class BaseTuner(nn.Module, ABC):
     - **_check_target_module_exists**:
         A private helper method to check if the passed module's key name matches any of the target modules in the
         adapter_config.
+    
+    如果想要自定义一个BaseTuner, 需要重写上面的3个方法: 
+    
+    第一个方法决定适配器配置;
+    第二个方法决定如何创建和替换目标模块;
+    第三个觉得如何寻找到目标模块(?).
 
     The easiest is to check what is done in the `peft.tuners.lora.LoraModel` class.
 
@@ -149,6 +155,15 @@ class BaseTuner(nn.Module, ABC):
         targeted_module_names (`list[str]`):
             The list of module names that were actually adapted. Can be useful to inspect if you want to quickly
             double-check that the `config.target_modules` were specified correctly.
+        
+    BaseTuner类有5个主要的属性: 
+    
+    第一个决定了要适配的模型;
+    第二个是模型的forward方法;
+    第三个是适配器的配置;
+    第四个是模型的配置;
+    第五个是被适配的模块的名字.
+    
     """
 
     def __init__(
