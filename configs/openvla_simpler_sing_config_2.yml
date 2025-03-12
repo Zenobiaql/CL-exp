@@ -1,8 +1,8 @@
 vla_path: "/mnt/data-qilin/openvla-7b/"                          
 
-data_dir: "/mnt/data-qilin/simpler_data_merged/"                       
+data_dir: "/mnt/data-qilin/simpler_data_drawer/"                       
 dataset_name: "simpler"                                
-run_root_dir: "/mnt/data-qilin/CL-exp/SingleTaskBaseline/rank8/"
+run_root_dir: "/mnt/data-qilin/sequential_finetune/"
 num_workers: 4                         
 
 epochs: 25                                                
@@ -14,6 +14,6 @@ grad_accumulation_steps: 1
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 8                                            
+lora_rank: 16                                            
 lora_dropout: 0.0
 lora_module: "all-linear"                                                                       
