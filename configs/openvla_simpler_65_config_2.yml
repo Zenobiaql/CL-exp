@@ -1,8 +1,8 @@
 vla_path: "/datahdd_8T/zql/CL-Adapter/openvla-7b"                          
 
-data_dir: "/datahdd_8T/zql/CL-Adapter/merged_dataset"                       
-dataset_name: "widowx_stack_cube"                                
-run_root_dir: "/datahdd_8T/zql/CL-Adapter/runs/0304-Debug-new"
+data_dir: "/datahdd_8T/zql/simpler_data_drawer"                       
+dataset_name: "simpler-data"                                
+run_root_dir: "/datahdd_8T/zql/check-runs/0312-Debug"
 num_workers: 4                         
 
 epochs: 25                                                
