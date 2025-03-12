@@ -9,7 +9,7 @@ from pathlib import Path
 import torch
 
 from transformers import AutoModelForVision2Seq, AutoProcessor
-from peft import LoraConfig, PeftModel, get_peft_model
+from m_peft import LoraConfig, PeftModel, get_peft_model
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from transformers import AutoModelForVision2Seq, AutoProcessor

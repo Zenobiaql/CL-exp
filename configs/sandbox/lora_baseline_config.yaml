@@ -2,7 +2,7 @@ vla_path: "/home/v-qilinzhang/openvla-7b/"
 
 data_dir: "/home/v-qilinzhang/simpler_data_split/"                       
 dataset_name: "google_robot_pick_vertical_coke_can"                                
-run_root_dir: "/home/v-qilinzhang/runs/0310-1655-PEFTcheck/"
+run_root_dir: "/home/v-qilinzhang/runs/0312-1117-M_PEFTcheck/"
 num_workers: 4                         
 
 epochs: 20                                                
