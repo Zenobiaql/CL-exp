@@ -2,10 +2,10 @@ vla_path: "/mnt/data-qilin/openvla-7b/"
 
 data_dir: "/mnt/data-qilin/simpler_data_split/"                       
 dataset_name: "google_robot_close_bottom_drawer"                                
-run_root_dir: "/mnt/data-qilin/LoRA-Baseline/rank4-single-task/"
+run_root_dir: "/mnt/data-qilin/LoRA-Baseline/rank64-single-task/"
 num_workers: 4                         
 
-epochs: 30                                                
+epochs: 50                                                
 batch_size: 4                                        
 
 save_steps: 1000                                          
@@ -14,6 +14,6 @@ grad_accumulation_steps: 1
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 4                                            
+lora_rank: 64                                            
 lora_dropout: 0.0
 lora_module: "all-linear"
