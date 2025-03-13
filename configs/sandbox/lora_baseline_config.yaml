@@ -2,11 +2,11 @@ vla_path: "/home/v-qilinzhang/openvla-7b/"
 
 data_dir: "/home/v-qilinzhang/simpler_data_split/"                       
 dataset_name: "google_robot_close_bottom_drawer"                                
-run_root_dir: "/home/v-qilinzhang/runs/0313-1609-Test-OLoRA/"
+run_root_dir: "/home/v-qilinzhang/runs/0313-1821-OLoRA/"
 num_workers: 4                         
 
 epochs: 20                                                
-batch_size: 18                                        
+batch_size: 16                                        
 
 save_steps: 1000                                          
 learning_rate: 1.5e-5                                     
