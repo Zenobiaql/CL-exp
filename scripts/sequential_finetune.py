@@ -336,7 +336,6 @@ def finetune(cfg: FinetuneConfig)->None:
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
             target_modules=cfg.lora_module,
-            init_lora_weights="gaussian",
         )
         init_vla = get_peft_model(init_vla, lora_config)
         init_vla.print_trainable_parameters()
