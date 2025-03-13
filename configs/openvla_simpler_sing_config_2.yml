@@ -1,8 +1,8 @@
 vla_path: "/mnt/data-qilin/openvla-7b/"                          
 
-data_dir: "/mnt/data-qilin/simpler_data_drawer/"                       
-dataset_name: "simpler"                                
-run_root_dir: "/mnt/data-qilin/sequential_finetune/"
+data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded/"                       
+dataset_name: "simpler-dataset"                                
+run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/LoRA_sqft/"
 num_workers: 4                         
 
 epochs: 25                                                
