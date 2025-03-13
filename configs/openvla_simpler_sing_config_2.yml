@@ -6,7 +6,7 @@ run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/OLoRA_sqft/"
 num_workers: 4                         
 
 epochs: 25                                                
-batch_size: 4                                        
+batch_size: 2                                        
 
 save_steps: 1000                                          
 learning_rate: 1.5e-5                                     

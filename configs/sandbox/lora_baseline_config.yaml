@@ -1,8 +1,8 @@
 vla_path: "/home/v-qilinzhang/openvla-7b/"                          
 
 data_dir: "/home/v-qilinzhang/simpler_data_split/"                       
-dataset_name: "google_robot_pick_vertical_coke_can"                                
-run_root_dir: "/home/v-qilinzhang/runs/0312-1117-M_PEFTcheck/"
+dataset_name: "google_robot_close_bottom_drawer"                                
+run_root_dir: "/home/v-qilinzhang/runs/0313-1609-Test-OLoRA/"
 num_workers: 4                         
 
 epochs: 20                                                
@@ -14,6 +14,6 @@ grad_accumulation_steps: 1
 image_aug: True                                          
 
 use_lora: True                                          
-lora_rank: 4                                            
+lora_rank: 16                                            
 lora_dropout: 0.0
 lora_module: "all-linear"
