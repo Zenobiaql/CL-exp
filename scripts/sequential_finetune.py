@@ -273,7 +273,7 @@ class Model:
             if self.use_lora:
                 #if dist.get_rank() == 0:
                     save_dir = self.run_dir
-                    self.vla.module.save_pretrained(os.path.join(save_dir, f'epoch{epoch}'))
+                    self.vla.save_pretrained(os.path.join(save_dir, "raw_adapter", f'epoch{epoch}'))
                 
                     base_vla = AutoModelForVision2Seq.from_pretrained(
                         self.vla_path,
