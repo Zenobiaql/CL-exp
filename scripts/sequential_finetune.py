@@ -36,6 +36,7 @@ from log import ModelLogger, ModuleTracker
 from copy import deepcopy
 from multiprocessing import cpu_count
 import numpy as np
+import shutil
 
 
 # DDP process group setup
@@ -101,6 +102,7 @@ class Model:
         optimizer, 
         vla,
         vla_path,
+        src_path,
         processor,
         action_tokenizer,
         use_lora,
@@ -129,6 +131,7 @@ class Model:
         self.vla_path = vla_path
         self.batch_size = batch_size
         self.device_id = device_id
+        self.src_path = src_path
 
     # calculating average training loss, used for logging
     def _average_training_loss(self, local_loss):
@@ -269,9 +272,30 @@ class Model:
 
             if self.use_lora:
                 #if dist.get_rank() == 0:
-                    self.logger_complex.log_checkpoint_saved(epoch)
                     save_dir = self.run_dir
                     self.vla.module.save_pretrained(os.path.join(save_dir, f'epoch{epoch}'))
+                
+                    base_vla = AutoModelForVision2Seq.from_pretrained(
+                        self.vla_path,
+                        torch_dtype=torch.bfloat16,
+                        low_cpu_mem_usage=True,
+                        trust_remote_code=True,
+                    )
+                    merged_vla = PeftModel.from_pretrained(base_vla, os.path.join(save_dir, "raw_adapter", f'epoch{epoch}'))
+                    merged_vla = merged_vla.merge_and_unload()
+                
+                    model_param_dir = os.path.join(self.run_dir, "merged", f"epoch{epoch}")
+                    os.makedirs(model_param_dir, exist_ok=True)
+                    self.processor.save_pretrained(model_param_dir)
+                    merged_vla.save_pretrained(model_param_dir)
+                    
+                    if os.path.exists(os.path.join(model_param_dir, "modeling_prismatic.py")) == False:
+                        shutil.copy(os.path.join(self.src_path, "modeling_prismatic.py"), os.path.join(model_param_dir, "modeling_prismatic.py"))
+                        print("code added")
+                        self.logger_complex.log_checkpoint_saved(epoch)
+                        
+                    else:
+                        self.logger_complex.log_checkpoint_saved(epoch)
 
             else:
                 ValueError("LoRA not used, please check configuration.")       
@@ -321,59 +345,59 @@ def finetune(cfg: FinetuneConfig)->None:
             
             val_dataloader_set[sub_dir.name] = val_dataloader
             
-    # get initialized vla
-    init_vla = AutoModelForVision2Seq.from_pretrained(
-        cfg.vla_path,
-        torch_dtype=torch.bfloat16,
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-    )
-
-    if cfg.use_lora:
-        lora_config = LoraConfig(
-            init_lora_weights="pissa",
-            r=cfg.lora_rank,
-            lora_alpha=min(cfg.lora_rank, 16),
-            lora_dropout=cfg.lora_dropout,
-            target_modules=cfg.lora_module,
-        )
-        init_vla = get_peft_model(init_vla, lora_config)
-        init_vla.print_trainable_parameters()
-    
-    device_id = int(os.environ["LOCAL_RANK"])
-    init_vla = init_vla.to(device_id)
-    init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
-    
-    trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
-    optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
-    module_tracker = ModuleTracker(trainable_params, cfg.run_root_dir)
-    module_tracker.trainable_module()
+    original_ckpt_path = cfg.vla_path
             
     for sub_dir in data_root_dir.iterdir():
         
-        # training set for current task
-        if sub_dir.is_dir():
-            # current task dataset
-            task_data = SplitDataset(
-                sub_dir,
-                action_tokenizer,
-                processor.tokenizer,
-                processor.image_processor.apply_transform,
-                prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
-            )
-                        
-            dataloader = DataLoader(
-                task_data,
-                batch_size=cfg.batch_size,
-                sampler=DistributedSampler(task_data, shuffle=True),
-                collate_fn=collator,
-                num_workers=cfg.num_workers,
-            )
-        
+        # make a directory for each task
         task_sub_dir = os.path.join(cfg.run_root_dir, sub_dir.name)
         os.makedirs(task_sub_dir, exist_ok=True)
+            
+        init_vla = AutoModelForVision2Seq.from_pretrained(
+            original_ckpt_path,
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+        )
+
+        if cfg.use_lora:
+            lora_config = LoraConfig(
+                init_lora_weights="olora",
+                r=cfg.lora_rank,
+                lora_alpha=min(cfg.lora_rank, 16),
+                lora_dropout=cfg.lora_dropout,
+                target_modules=cfg.lora_module,
+            )
+            init_vla = get_peft_model(init_vla, lora_config)
+            init_vla.print_trainable_parameters()
+    
+        device_id = int(os.environ["LOCAL_RANK"])
+        init_vla = init_vla.to(device_id)
+        init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
+            
+        trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
+        optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
+        module_tracker = ModuleTracker(trainable_params, task_sub_dir)
+        module_tracker.trainable_module()
+            
+        # current task dataset
+        task_data = SplitDataset(
+            sub_dir,
+            action_tokenizer,
+            processor.tokenizer,
+            processor.image_processor.apply_transform,
+            prompt_builder_fn=PurePromptBuilder if "v01" not in cfg.vla_path else VicunaV15ChatPromptBuilder,
+        )
+                        
+        dataloader = DataLoader(
+            task_data,
+            batch_size=cfg.batch_size,
+            sampler=DistributedSampler(task_data, shuffle=True),
+            collate_fn=collator,
+            num_workers=cfg.num_workers,
+        )
                 
-        logger_complex = ModelLogger(cfg.vla_path, sub_dir.name, cfg.batch_size, cfg.learning_rate, task_sub_dir)
+        logger_complex = ModelLogger(original_ckpt_path, sub_dir.name, cfg.batch_size, cfg.learning_rate, task_sub_dir)
             
         exp_id = (
             f"{data_root_dir.name}"
@@ -395,6 +419,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
             optimizer, 
             init_vla,
+            original_ckpt_path,
             cfg.vla_path,
             processor,
             action_tokenizer,
@@ -407,8 +432,8 @@ def finetune(cfg: FinetuneConfig)->None:
             device_id,
         )
 
-        model_train.train_step()
-
+        model_train.train_step()   
+        original_ckpt_path = os.path.join(str(task_sub_dir), "merged", f"epoch{cfg.epochs - 1}")
 
     dist.destroy_process_group()
     print(f"Finished running code on rank {device_id}.")
