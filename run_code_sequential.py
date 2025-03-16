@@ -31,7 +31,7 @@ from collections import deque
 from dataset import PizzaDataset
 import random
 from typing import List, Union
-from scripts.sequential_finetune import finetune
+from scripts.sequential_finetune_DoRA import finetune
 
 @dataclass
 class FinetuneConfig:

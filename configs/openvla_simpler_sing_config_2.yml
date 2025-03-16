@@ -2,10 +2,10 @@ vla_path: "/mnt/data-qilin/openvla-7b/"
 
 data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded/"                       
 dataset_name: "simpler-dataset"                                
-run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/OLoRA-modified_sqft/"
+run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/DoRA_sqft/"
 num_workers: 4                         
 
-epochs: 25                                                
+epochs: 15                                                
 batch_size: 3                                        
 
 save_steps: 1000                                          
