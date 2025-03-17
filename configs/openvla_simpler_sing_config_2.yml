@@ -5,7 +5,7 @@ dataset_name: "simpler-dataset"
 run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/DoRA_sqft/"
 num_workers: 4                         
 
-epochs: 15                                                
+epochs: 25                                                
 batch_size: 3                                        
 
 save_steps: 1000                                          
