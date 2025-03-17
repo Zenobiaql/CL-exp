@@ -102,7 +102,7 @@ class Model:
         optimizer, 
         vla,
         vla_path,
-        src_path,
+        
         processor,
         action_tokenizer,
         use_lora,
@@ -131,7 +131,6 @@ class Model:
         self.vla_path = vla_path
         self.batch_size = batch_size
         self.device_id = device_id
-        self.src_path = src_path
 
     # calculating average training loss, used for logging
     def _average_training_loss(self, local_loss):
@@ -322,6 +321,34 @@ def finetune(cfg: FinetuneConfig)->None:
     collator = PaddedCollatorForActionPrediction(
         processor.tokenizer.model_max_length, processor.tokenizer.pad_token_id, padding_side="right"
     )
+
+    init_vla = AutoModelForVision2Seq.from_pretrained(
+            cfg.vla_path,
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+        )
+
+    if cfg.use_lora:
+        lora_config = LoraConfig(
+            use_dora = True,
+            init_lora_weights="gaussian",
+            r=cfg.lora_rank,
+            lora_alpha=min(cfg.lora_rank, 16),
+            lora_dropout=cfg.lora_dropout,
+            target_modules=cfg.lora_module,
+        )
+        init_vla = get_peft_model(init_vla, lora_config)
+        init_vla.print_trainable_parameters()
+    
+    device_id = int(os.environ["LOCAL_RANK"])
+    init_vla = init_vla.to(device_id)
+    init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
+            
+    trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
+    optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
+    module_tracker = ModuleTracker(trainable_params, cfg.run_root_dir)
+    module_tracker.trainable_module()
     
     data_root_dir = Path(os.path.join(cfg.data_dir, "train"))
     val_data_dir = Path(os.path.join(cfg.data_dir, "val"))
@@ -348,41 +375,12 @@ def finetune(cfg: FinetuneConfig)->None:
             
             val_dataloader_set[sub_dir.name] = val_dataloader
             
-    original_ckpt_path = cfg.vla_path
-            
+    # training loop
     for sub_dir in data_root_dir.iterdir():
         
         # make a directory for each task
         task_sub_dir = os.path.join(cfg.run_root_dir, sub_dir.name)
         os.makedirs(task_sub_dir, exist_ok=True)
-            
-        init_vla = AutoModelForVision2Seq.from_pretrained(
-            original_ckpt_path,
-            torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=True,
-            trust_remote_code=True,
-        )
-
-        if cfg.use_lora:
-            lora_config = LoraConfig(
-                use_dora = True,
-                init_lora_weights="gaussian",
-                r=cfg.lora_rank,
-                lora_alpha=min(cfg.lora_rank, 16),
-                lora_dropout=cfg.lora_dropout,
-                target_modules=cfg.lora_module,
-            )
-            init_vla = get_peft_model(init_vla, lora_config)
-            init_vla.print_trainable_parameters()
-    
-        device_id = int(os.environ["LOCAL_RANK"])
-        init_vla = init_vla.to(device_id)
-        init_vla = DDP(init_vla, device_ids=[device_id], find_unused_parameters=True)
-            
-        trainable_params = [param for param in init_vla.module.parameters() if param.requires_grad]
-        optimizer = AdamW(trainable_params, lr=cfg.learning_rate)
-        module_tracker = ModuleTracker(trainable_params, task_sub_dir)
-        module_tracker.trainable_module()
             
         # current task dataset
         task_data = SplitDataset(
@@ -401,7 +399,7 @@ def finetune(cfg: FinetuneConfig)->None:
             num_workers=cfg.num_workers,
         )
                 
-        logger_complex = ModelLogger(original_ckpt_path, sub_dir.name, cfg.batch_size, cfg.learning_rate, task_sub_dir)
+        logger_complex = ModelLogger(cfg.vla_path, sub_dir.name, cfg.batch_size, cfg.learning_rate, task_sub_dir)
             
         exp_id = (
             f"{data_root_dir.name}"
@@ -423,7 +421,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
             optimizer, 
             init_vla,
-            original_ckpt_path,
+            
             cfg.vla_path,
             processor,
             action_tokenizer,
