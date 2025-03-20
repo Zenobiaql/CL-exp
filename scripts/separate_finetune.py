@@ -357,6 +357,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
     if cfg.use_lora:
         lora_config = LoraConfig(
+            use_dora = True,
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
