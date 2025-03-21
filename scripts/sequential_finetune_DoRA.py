@@ -291,13 +291,13 @@ class Model:
                         self.processor.save_pretrained(model_param_dir)
                         merged_vla.save_pretrained(model_param_dir)
                         
-                        if os.path.exists(os.path.join(model_param_dir, "modeling_prismatic.py")) == False:
-                            shutil.copy(os.path.join(self.src_path, "modeling_prismatic.py"), os.path.join(model_param_dir, "modeling_prismatic.py"))
-                            print("code added")
-                            self.logger_complex.log_checkpoint_saved(epoch)
+                        #if os.path.exists(os.path.join(model_param_dir, "modeling_prismatic.py")) == False:
+                        #    shutil.copy(os.path.join(self.src_path, "modeling_prismatic.py"), os.path.join(model_param_dir, "modeling_prismatic.py"))
+                        #    print("code added")
+                        #    self.logger_complex.log_checkpoint_saved(epoch)
                             
-                        else:
-                            self.logger_complex.log_checkpoint_saved(epoch)
+                        #else:
+                        self.logger_complex.log_checkpoint_saved(epoch)
 
             else:
                 ValueError("LoRA not used, please check configuration.")       
