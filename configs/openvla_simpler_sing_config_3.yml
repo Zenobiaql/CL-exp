@@ -1,8 +1,8 @@
-vla_path: "/mnt/data-qilin/openvla-7b/"                          
+vla_path: "/mnt/data-qilin/sequential_finetune_baseline/sqft_test_1/google_robot_close_bottom_drawer/merged/epoch0"                          
 
 data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded/"                       
 dataset_name: "simpler-dataset"                                
-run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/DoRA_modified_sqft_test_1/"
+run_root_dir: "/mnt/data-qilin/sequential_finetune_baseline/sqft_test_2/"
 num_workers: 4                         
 
 epochs: 1                                                
