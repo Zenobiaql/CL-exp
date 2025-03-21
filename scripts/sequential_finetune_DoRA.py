@@ -8,6 +8,7 @@ import tqdm
 import logging
 import time
 from pathlib import Path
+import datetime
 
 import torch
 import torch.distributed as dist
@@ -43,7 +44,7 @@ import shutil
 def ddp_setup():
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
     if not dist.is_initialized():
-        dist.init_process_group(backend='nccl', timeout=torch.distributed.timedelta(seconds=3600))
+        dist.init_process_group(backend='nccl', timeout=datetime.timedelta(seconds=3600))
 
 
 """
