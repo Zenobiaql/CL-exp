@@ -298,6 +298,8 @@ class Model:
                             
                         #else:
                         self.logger_complex.log_checkpoint_saved(epoch)
+                        
+                dist.barrier()
 
             else:
                 ValueError("LoRA not used, please check configuration.")       
