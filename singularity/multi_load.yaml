@@ -59,14 +59,14 @@ jobs:
       - source activate base
       - conda activate openvla
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config1.yaml
-      - python load/load1.py
+      - python load1.py
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config2.yaml
-      - python load/load2.py
+      - python load2.py
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config3.yaml
-      - python load/load3.py
+      - python load3.py
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config4.yaml
-      - python load/load4.py
+      - python load4.py
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config5.yaml
-      - python load/load5.py
+      - python load5.py
       - torchrun --standalone --nproc_per_node=8 run_code_mr_sqft.py --config_path=configs/mr_sqft/config6.yaml
-      - python load/load6.py
+      - python load6.py
