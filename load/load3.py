@@ -14,7 +14,7 @@ import torch
 import torch.distributed as dist
 
 from transformers import AutoModelForVision2Seq, AutoProcessor
-from m_peft import LoraConfig, PeftModel, get_peft_model
+from peft import LoraConfig, PeftModel, get_peft_model
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
 from torch.utils.data import DataLoader, Subset
@@ -44,8 +44,8 @@ import shutil
 class LoadConfigs:
     def __init__(self):
         self.vla_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_middle_drawer/merged/epoch0"
-        self.adapter_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_top_drawer/raw_adapter/epoch0"
-        self.ckpt_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_top_drawer/merged/epoch0"
+        self.adapter_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_top_drawer/raw_adapter/epoch24"
+        self.ckpt_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_top_drawer/merged/epoch24"
 
 # load model       
 def load_model(cfg: LoadConfigs):

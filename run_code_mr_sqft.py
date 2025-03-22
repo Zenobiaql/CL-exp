@@ -13,7 +13,7 @@ import torch
 import torch.distributed as dist
 
 from transformers import AutoModelForVision2Seq, AutoProcessor
-from peft import LoraConfig, PeftModel, get_peft_model
+from m_peft import LoraConfig, PeftModel, get_peft_model
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
 from torch.utils.data import DataLoader, Subset
