@@ -48,7 +48,8 @@ class LoadConfigs:
         self.ckpt_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_open_bottom_drawer/merged/epoch0"
 
 # load model       
-def load_model(cfg: LoadConfigs):
+def load_model():
+    cfg = LoadConfigs()
     processor = AutoProcessor.from_pretrained(cfg.vla_path, 
                                               trust_remote_code=True)
     
@@ -71,3 +72,6 @@ def load_model(cfg: LoadConfigs):
         print("\n----------\ncode added\n----------\n")
     
     print("\n----------\nmodel saved\n----------\n")
+    
+if __name__ == "__main__":
+    load_model()
