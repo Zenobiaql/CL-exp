@@ -43,9 +43,9 @@ import shutil
 # load configs
 class LoadConfigs:
     def __init__(self):
-        self.vla_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_bottom_drawer/merged/epoch0"
-        self.adapter_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_middle_drawer/raw_adapter/epoch0"
-        self.ckpt_path = "/mnt/data-qilin/mr_sqft/DoRA/google_robot_close_middle_drawer/merged/epoch0"
+        self.vla_path = "/mnt/data-qilin/mr_sqft/OLoRA/google_robot_close_bottom_drawer/merged/epoch24"
+        self.adapter_path = "/mnt/data-qilin/mr_sqft/OLoRA/google_robot_close_middle_drawer/raw_adapter/epoch24"
+        self.ckpt_path = "/mnt/data-qilin/mr_sqft/OLoRA/google_robot_close_middle_drawer/merged/epoch24"
 
 # load model       
 def load_model():
