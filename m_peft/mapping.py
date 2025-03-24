@@ -184,6 +184,7 @@ def get_peft_model(
     old_name = peft_config.base_model_name_or_path
     new_name = model.__dict__.get("name_or_path", None)
     peft_config.base_model_name_or_path = new_name
+    # 将peft_config的base_model_name_or_path属性设置为model的name_or_path属性
 
     if (old_name is not None) and (old_name != new_name):
         warnings.warn(
@@ -212,6 +213,7 @@ def get_peft_model(
         # note: PeftMixedModel does not support autocast_adapter_dtype, so don't pass it
         return PeftMixedModel(model, peft_config, adapter_name=adapter_name)
 
+    # 由于并未指定peft_config的task_type, 所以默认使用PeftModel
     if peft_config.task_type not in MODEL_TYPE_TO_PEFT_MODEL_MAPPING.keys() and not peft_config.is_prompt_learning:
         return PeftModel(
             model,
@@ -223,6 +225,7 @@ def get_peft_model(
 
     if peft_config.is_prompt_learning:
         peft_config = _prepare_prompt_learning_config(peft_config, model_config)
+        
     return MODEL_TYPE_TO_PEFT_MODEL_MAPPING[peft_config.task_type](
         model,
         peft_config,

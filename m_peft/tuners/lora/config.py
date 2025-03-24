@@ -20,8 +20,8 @@ from typing import Literal, Optional, Union
 
 from torch import nn
 
-from peft.config import PeftConfig
-from peft.utils import PeftType
+from m_peft.config import PeftConfig
+from m_peft.utils import PeftType
 
 
 @dataclass
@@ -128,6 +128,7 @@ class LoraConfig(PeftConfig):
     Args:
         r (`int`):
             Lora attention dimension (the "rank").
+        LoRA的秩
         target_modules (`Optional[Union[List[str], str]]`):
             The names of the modules to apply the adapter to. If this is specified, only the modules with the specified
             names will be replaced. When passing a string, a regex match will be performed. When passing a list of
@@ -136,10 +137,12 @@ class LoraConfig(PeftConfig):
             excluding the output layer. If this is not specified, modules will be chosen according to the model
             architecture. If the architecture is not known, an error will be raised -- in this case, you should specify
             the target modules manually.
+        LoRA的目标模块, OpenVLA有437个LoRA对象, 每个对象都有一个LoRA
         exclude_modules (`Optional[Union[List[str], str]]`):
             The names of the modules to not apply the adapter. When passing a string, a regex match will be performed.
             When passing a list of strings, either an exact match will be performed or it is checked if the name of the
             module ends with any of the passed strings.
+        剔除某些模块, 目前没有使用
         lora_alpha (`int`):
             The alpha parameter for Lora scaling.
         lora_dropout (`float`):
@@ -147,6 +150,7 @@ class LoraConfig(PeftConfig):
         fan_in_fan_out (`bool`):
             Set this to True if the layer to replace stores weight like (fan_in, fan_out). For example, gpt-2 uses
             `Conv1D` which stores weights like (fan_in, fan_out) and hence this should be set to `True`.
+        权重矩阵的存储方式, OpenVLA没有使用
         bias (`str`):
             Bias type for LoRA. Can be 'none', 'all' or 'lora_only'. If 'all' or 'lora_only', the corresponding biases
             will be updated during training. Be aware that this means that, even when disabling the adapters, the model
@@ -172,6 +176,7 @@ class LoraConfig(PeftConfig):
             initialization, where `[number of iters]` indicates the number of subspace iterations to perform FSVD, and
             must be a nonnegative integer. When `[number of iters]` is set to 16, it can complete the initialization of
             a 7B model within seconds, and the training effect is approximately equivalent to using SVD.
+        目前我们使用了OLoRA和PiSSA, 还有传统的Gaussian
         layers_to_transform (`Union[List[int], int]`):
             The layer indices to transform. If a list of ints is passed, it will apply the adapter to the layer indices
             that are specified in this list. If a single integer is passed, it will apply the transformations on the
@@ -509,3 +514,5 @@ class LoraConfig(PeftConfig):
         if self._custom_modules is None:
             self._custom_modules = {}
         self._custom_modules.update(mapping)
+        
+        

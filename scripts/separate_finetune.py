@@ -13,7 +13,7 @@ import torch
 import torch.distributed as dist
 
 from transformers import AutoModelForVision2Seq, AutoProcessor
-from peft import LoraConfig, PeftModel, get_peft_model
+from m_peft import LoraConfig, PeftModel, get_peft_model
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
 from torch.utils.data import DataLoader, Subset
@@ -358,7 +358,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
     if cfg.use_lora:
         lora_config = LoraConfig(
-            use_dora = True,
+            #use_dora = True,
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,

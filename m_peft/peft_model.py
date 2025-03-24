@@ -164,11 +164,13 @@ class PeftModel(PushToHubMixin, torch.nn.Module):
         self.special_peft_forward_args = {"adapter_names"}
 
         self._is_prompt_learning = peft_config.is_prompt_learning
+        # 我们用的不是PL, 这里用不到
         if self._is_prompt_learning:
             self._peft_config = {adapter_name: peft_config}
             self.base_model = model
             self.add_adapter(adapter_name, peft_config, low_cpu_mem_usage=low_cpu_mem_usage)
         else:
+            # 由于我们用的是OLoRA, PiSSA和DoRA, 所以用的是LoRAModel
             self._peft_config = None
             cls = PEFT_TYPE_TO_MODEL_MAPPING[peft_config.peft_type]
             ctx = init_empty_weights if low_cpu_mem_usage else nullcontext

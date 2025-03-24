@@ -26,15 +26,15 @@ import torch
 from torch import nn
 from tqdm import tqdm
 
-from peft.import_utils import is_bnb_4bit_available, is_bnb_available
-from peft.tuners.tuners_utils import (
+from m_peft.import_utils import is_bnb_4bit_available, is_bnb_available
+from m_peft.tuners.tuners_utils import (
     BaseTuner,
     BaseTunerLayer,
     check_target_module_exists,
     onload_layer,
     replicate_layers,
 )
-from peft.utils import (
+from m_peft.utils import (
     TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING,
     ModulesToSaveWrapper,
     _freeze_adapter,
@@ -42,8 +42,8 @@ from peft.utils import (
     get_peft_model_state_dict,
     get_quantization_config,
 )
-from peft.utils.merge_utils import dare_linear, dare_ties, magnitude_prune, task_arithmetic, ties
-from peft.utils.other import get_pattern_key
+from m_peft.utils.merge_utils import dare_linear, dare_ties, magnitude_prune, task_arithmetic, ties
+from m_peft.utils.other import get_pattern_key
 
 from .aqlm import dispatch_aqlm
 from .awq import dispatch_awq
@@ -135,6 +135,7 @@ class LoraModel(BaseTuner):
         - **peft_config** ([`LoraConfig`]): The configuration of the Lora model.
     """
 
+    # LoRA施加模块特有的前缀
     prefix: str = "lora_"
 
     def __init__(self, model, config, adapter_name, low_cpu_mem_usage: bool = False) -> None:
@@ -218,7 +219,7 @@ class LoraModel(BaseTuner):
                 kwargs[f"{quant_method}_quantization_config"] = quantization_config
 
         # note: AdaLoraLayer is a subclass of LoraLayer, we need to exclude it
-        from peft.tuners.adalora import AdaLoraLayer
+        from m_peft.tuners.adalora import AdaLoraLayer
 
         if isinstance(target, LoraLayer) and not isinstance(target, AdaLoraLayer):
             target.update_layer(
