@@ -2,7 +2,7 @@ vla_path: "/mnt/data-qilin/openvla-7b"
 
 data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded"                       
 dataset_name: "google_robot_close_bottom_drawer"                                
-run_root_dir: "/mnt/data-qilin/mr_sqft/PiSSA"
+run_root_dir: "/mnt/data-qilin/mr_sqft/DoRA"
 num_workers: 4                         
 
 epochs: 25                                                
