@@ -275,31 +275,6 @@ class Model:
                     save_dir = self.run_dir
                     self.vla.module.save_pretrained(os.path.join(save_dir, "raw_adapter", f'epoch{epoch}'))
                     self.logger_complex.log_checkpoint_saved(epoch)
-
-                    if epoch == self.epochs - 1:
-
-                        base_vla = AutoModelForVision2Seq.from_pretrained(
-                            self.vla_path,
-                            torch_dtype=torch.bfloat16,
-                            low_cpu_mem_usage=True,
-                            trust_remote_code=True,
-                        )
-                        merged_vla = PeftModel.from_pretrained(base_vla, os.path.join(save_dir, "raw_adapter", f'epoch{epoch}'))
-                        merged_vla = merged_vla.merge_and_unload()
-                    
-                        model_param_dir = os.path.join(self.run_dir, "merged", f"epoch{epoch}")
-                        os.makedirs(model_param_dir, exist_ok=True)
-                        self.processor.save_pretrained(model_param_dir)
-                        merged_vla.save_pretrained(model_param_dir)
-                        
-                        #if os.path.exists(os.path.join(model_param_dir, "modeling_prismatic.py")) == False:
-                        #    shutil.copy(os.path.join(self.src_path, "modeling_prismatic.py"), os.path.join(model_param_dir, "modeling_prismatic.py"))
-                        #    print("code added")
-                        #    self.logger_complex.log_checkpoint_saved(epoch)
-                            
-                        #else:
-                        self.logger_complex.log_checkpoint_saved(epoch)
-                        
                 dist.barrier()
 
             else:
@@ -334,8 +309,7 @@ def finetune(cfg: FinetuneConfig)->None:
 
     if cfg.use_lora:
         lora_config = LoraConfig(
-            use_dora = True,
-            init_lora_weights="gaussian",
+            init_lora_weights="pissa",
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
