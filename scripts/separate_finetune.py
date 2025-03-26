@@ -358,12 +358,11 @@ def finetune(cfg: FinetuneConfig)->None:
 
     if cfg.use_lora:
         lora_config = LoraConfig(
-            use_dora=True,
             r=cfg.lora_rank,
             lora_alpha=min(cfg.lora_rank, 16),
             lora_dropout=cfg.lora_dropout,
             target_modules=cfg.lora_module,
-            init_lora_weights="gaussian",
+            init_lora_weights="olora",
         )
         init_vla = get_peft_model(init_vla, lora_config)
         init_vla.print_trainable_parameters()
