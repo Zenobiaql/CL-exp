@@ -1,0 +1,36 @@
+vla_path: "/mnt/data-qilin/openvla-7b/"                          
+
+data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded/"                       
+dataset_name: "simpler-dataset"                                
+run_root_dir: "/mnt/data-qilin/sl_sqft/PISSA_debug/"
+num_workers: 4                         
+
+epochs: 25                                                
+batch_size: 3                                        
+
+save_steps: 1000                                          
+learning_rate: 1.5e-5                                     
+grad_accumulation_steps: 1                            
+image_aug: True                                          
+
+use_lora: True                                          
+lora_rank: 16                                            
+lora_dropout: 0.0
+lora_module: [
+    "q_proj",
+    "lm_head",
+    "kv",
+    "gate_proj",
+    "up_proj",
+    "o_proj",
+    "fc2",
+    "down_proj",
+    "qkv",
+    "k_proj",
+    "fc3",
+    "v_proj",
+    "q",
+    "fc1",
+    attn.proj,
+    attn_pool.proj,
+  ]                     
