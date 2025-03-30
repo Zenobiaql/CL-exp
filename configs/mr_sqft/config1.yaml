@@ -2,10 +2,10 @@ vla_path: "/mnt/data-qilin/openvla-7b"
 
 data_dir: "/mnt/data-qilin/simpler_data_drawer_expanded"                       
 dataset_name: "google_robot_close_bottom_drawer"                                
-run_root_dir: "/mnt/data-qilin/mr_sqft/OLoRA"
+run_root_dir: "/mnt/data-qilin/mr_sqft/OLoRA_more_epochs"
 num_workers: 4                         
 
-epochs: 25                                                
+epochs: 50                                                
 batch_size: 4                                        
 
 save_steps: 1000                                          
