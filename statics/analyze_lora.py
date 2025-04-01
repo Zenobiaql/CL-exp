@@ -79,7 +79,7 @@ task = [
     "google_robot_open_middle_drawer",
     "google_robot_open_top_drawer",
 ]
-root = "/home/v-qilinzhang/lora_slsqft"
+root = "/home/v-qilinzhang/pissa_slsqft_withbug"
 vision_sim = []
 other_sim = []
 
@@ -118,6 +118,6 @@ for i in range(24, len(epochs), 25):
     plt.axvline(x=i, color='red', linestyle='--', linewidth=0.5)
 
 # 保存图像文件
-plt.savefig('test_new_line_new.png')
+plt.savefig('test_new_line_new_pissa.png')
 
 print("All Done")

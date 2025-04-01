@@ -12,7 +12,6 @@ from safetensors import safe_open
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-import csv
 from sklearn.decomposition import TruncatedSVD
 
 
@@ -42,7 +41,7 @@ def compare_tensors(tensors_0, tensors_1):
     num_vision_layers = 0
     key_pairs = []
     for key in tqdm(tensors_0.keys()):
-        if "lora" in key:
+        if "lora" in key and "patch" not in key:
             parts = key.rsplit('.lora', 1)
             #print(f"key: {key}, parts: {parts}")
             new_key = parts[0]
@@ -82,15 +81,17 @@ task = [
     "google_robot_open_middle_drawer",
     "google_robot_open_top_drawer",
 ]
-root = "/home/v-qilinzhang/lora_slsqft"
+root = "/home/v-qilinzhang/pissa_slsqft"
 vision_sim = []
 other_sim = []
 
 for k in tqdm(range(6)):
-    file_root = os.path.join(root, task[k])
+    file_root = os.path.join(root, task[k], "raw_adapter")
     if k < 5:
-        new_file_root = os.path.join(root, task[k+1])
+        new_file_root = os.path.join(root, task[k+1], "raw_adapter")
     for i in tqdm(range(24)):
+        with open("tracker.txt", "a") as f:
+            f.write(f"check epoch {i} in task {task[k]}\n")
         file_path_0 = os.path.join(file_root, f"epoch{i}/adapter_model.safetensors")
         file_path_1 = os.path.join(file_root, f"epoch{i+1}/adapter_model.safetensors")
         tensors_0 = load_safetensors(file_path_0)
@@ -113,9 +114,9 @@ plt.plot(epochs, vision_sim, label="vision", color='blue')
 plt.xlabel('Epochs')
 plt.ylabel('Cosine Similarity')
 for i in range(24, len(epochs), 25):
-    plt.axvline(x=i, color='gray', linestyle='--', linewidth=0.5)
-plt.title('Cosine Similarity between Epochs, Single Initialized LoRA')
+    plt.axvline(x=i, color='red', linestyle='--', linewidth=2)
+plt.title('Cosine Similarity between Epochs, Single Initialized PiSSA')
 plt.legend()
 plt.grid(True)
-plt.savefig('lora_slsqft.png')
+plt.savefig('pissa_slsqft_long.png')
 print("\nDone\n")

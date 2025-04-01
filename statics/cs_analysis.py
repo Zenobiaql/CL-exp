@@ -114,5 +114,5 @@ for i in range(24, len(epochs), 25):
 plt.title('Cosine Similarity between Epochs, Single Initialized LoRA')
 plt.legend()
 #plt.grid(True)
-plt.savefig('lora_slsqft.png')
+plt.savefig('lora_slsqft_new.png')
 print("\nDone\n")
