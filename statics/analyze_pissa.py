@@ -6,46 +6,26 @@ import numpy as np
 from tqdm import tqdm
 
 def cosine_similarity(tensor1, tensor2):
-    
-    # 确保张量被展平
     tensor1_flat = tensor1.contiguous().view(-1)
     tensor2_flat = tensor2.contiguous().view(-1)
-    
-    # 计算点积
     dot_product = torch.dot(tensor1_flat, tensor2_flat)
-    
-    # 计算张量的范数
     norm_tensor1 = torch.norm(tensor1_flat)
     norm_tensor2 = torch.norm(tensor2_flat)
-    
-    # 计算余弦相似度
     cosine_sim = dot_product / (norm_tensor1 * norm_tensor2)
     
     return cosine_sim.item()
 
 def load_safetensors(file_path):
-    # Load the safetensors file
     with safe_open(file_path, framework="pt") as f:
         tensors = {key: f.get_tensor(key) for key in f.keys()}
     return tensors
             
 def compare_tensors(tensors_0, tensors_1):
-    vision_average_cosine_sim = 0
-    other_average_cosine_sim = 0
-    num_vision_layers = 0
+    average_cosine_sim = 0
     for key in tqdm(tensors_0.keys()):
-        if "vision" in key:
-            num_vision_layers += 1
             tensor_0 = tensors_0[key].to(torch.float32)
             tensor_1 = tensors_1[key].to(torch.float32)
-            u_1, s_1, vh_1 = torch.svd(tensor_0)
-            u_2, s_2, vh_2 = torch.svd(tensor_1)
-            cosine_sim = cosine_similarity(u_1, u_2)
-            vision_average_cosine_sim += cosine_sim
-        else:
-            tensor_0 = tensors_0[key].to(torch.float32)
-            tensor_1 = tensors_1[key].to(torch.float32)
-            u_1, s_1, vh_1 = torch.svd(tensor_0)
+            u_1, s_1, vh_1 = torch.linalg.svd(tensor_0)
             u_2, s_2, vh_2 = torch.svd(tensor_1)
             cosine_sim = cosine_similarity(u_1, u_2)
             other_average_cosine_sim += cosine_sim
